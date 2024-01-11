@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { Router, RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -10,5 +10,34 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'spotify-taeyeon-shenanigans';
+  title: string = 'spotify-taeyeon-shenanigans';
+  authToken: string = "";
+  urlRawParams: string = "";
+  urlParams: string = "";
+  
+  constructor(
+    private router: Router,
+    @Inject(PLATFORM_ID) protected platformId: Object
+  ) {}
+
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      let url = window.location.href;
+      if (url.includes('?')) {
+        this.checkUrl(url);
+      }
+    }
+  }
+
+  checkUrl(url: string): void {
+    console.log("checkign url");
+    this.urlRawParams = url.split('?')[1];
+    this.urlParams = this.urlRawParams.split('#')[0];
+    if (this.urlParams == 'authorized=true') {
+      this.authToken = url.split('#')[1];
+      sessionStorage.setItem('token', this.authToken);
+      this.router.navigate(['./home']);
+    }
+  }
 }

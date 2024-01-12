@@ -1,4 +1,4 @@
-import { Component, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 
@@ -9,7 +9,7 @@ import { Router, RouterOutlet } from '@angular/router';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title: string = 'spotify-taeyeon-shenanigans';
   authToken: string = "";
   urlRawParams: string = "";
@@ -17,13 +17,13 @@ export class AppComponent {
   
   constructor(
     private router: Router,
-    @Inject(PLATFORM_ID) protected platformId: Object
+    @Inject(PLATFORM_ID) protected platformId: object
   ) {}
 
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
-      let url = window.location.href;
+      const url = window.location.href;
       if (url.includes('?')) {
         this.checkUrl(url);
       }

@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { SpotifyService } from '../../_shared/services/spotify.service';
 
 @Component({
   selector: 'app-login',
@@ -9,7 +8,6 @@ import { SpotifyService } from '../../_shared/services/spotify.service';
   styleUrl: './login.component.scss'
 })
 export class LoginComponent {
-  constructor(private spotifyService: SpotifyService) { }
-
+  constructor() { }
 
 }

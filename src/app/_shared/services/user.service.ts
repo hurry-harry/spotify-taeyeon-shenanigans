@@ -8,6 +8,7 @@ export class UserService {
   private user: UserProfileResponse = {} as UserProfileResponse;
   
   userSignal: WritableSignal<UserProfileResponse> = signal(this.user);
+  authTokenSignal: WritableSignal<string> = signal(this.authToken);
 
   constructor(
     private http: HttpClient) { }

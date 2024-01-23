@@ -1,3 +1,5 @@
+import { ExternalUrls, Followers, Image } from "./spotify-shared.model";
+
 export interface UserProfileResponse {
     country: string;
     display_name: string;
@@ -16,19 +18,4 @@ export interface UserProfileResponse {
 export interface ExplicitContent {
     filter_enabled: boolean;
     filter_locked: boolean;
-}
-
-export interface ExternalUrls {
-    spotify: string;
-}
-
-export interface Followers {
-    href: string; // will always be null, Spotify Web API currently does not support it
-    total: number;
-}
-
-export interface Image {
-    url: string;
-    height: number; // in pixels
-    width: number; // in pixels
 }

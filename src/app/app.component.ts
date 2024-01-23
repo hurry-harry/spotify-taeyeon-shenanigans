@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from './_shared/services/user.service';
+import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet],
+  imports: [CommonModule, RouterOutlet, NavBarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -34,7 +35,7 @@ export class AppComponent implements OnInit {
     if (this.urlParams == 'authorized=true') {
       this.authToken = url.split('#')[1];
       sessionStorage.setItem('authToken', this.authToken);
-      this.userService.setAuthToken(this.authToken);
+      this.userService.authTokenSignal.set(this.authToken);
       this.router.navigate(['./home']);
     }
   }

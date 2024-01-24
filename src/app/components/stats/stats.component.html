@@ -5,7 +5,7 @@
   </select>
   <div>
     @for (mode of topItemModeSelection; track mode) {
-      <div class="background-color: red" (click)="changeItemMode(mode)">
+      <div class="background-color: red" (click)="changeItemMode(mode)" (keypress)="changeItemMode(mode)" tabindex="0">
         {{mode}}
       </div>
     } @empty {

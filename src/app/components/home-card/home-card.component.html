@@ -1,5 +1,5 @@
-<div class="card" (click)="navigateTo()">
-  <img class="image card__item" src="{{ card.imageSource }}">
+<div class="card" (click)="navigateTo()" (keypress)="navigateTo()" tabindex="0">
+  <img alt="card icon" class="image card__item" src="{{ card.imageSource }}">
   <h2 class="card__item">{{ card.title }}</h2>
   <p class="card__description">{{ card.description }}</p>
 </div>

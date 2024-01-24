@@ -4,9 +4,9 @@
   </div>
   <div>
     @if(user.display_name) {
-      <img class="profile-pic" src="{{user.images[0].url}}">
+      <img alt="spotify profile pic" class="profile-pic" src="{{user.images[0].url}}">
     } @else {
-      <img class="profile-pic" src="assets/default_profile_pic.png">
+      <img alt="default profile pic" class="profile-pic" src="assets/default_profile_pic.png">
     }
   </div>
 </div>

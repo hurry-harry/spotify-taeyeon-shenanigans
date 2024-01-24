@@ -1,1 +1,48 @@
-<p>stats works!</p>
+<div>
+  <h1>Your Music Favorites</h1>
+  <select [ngModel]="timeRange" (change)="changeTimeRange($event)">
+    <option *ngFor="let time of timeRangeSelection" [value]="time">{{time}}</option>
+  </select>
+  <div>
+    @for (mode of topItemModeSelection; track mode) {
+      <div class="background-color: red" (click)="changeItemMode(mode)">
+        {{mode}}
+      </div>
+    } @empty {
+      empty mode
+    }
+  </div>
+
+  @if (!isLoading) {
+    @if (topItemMode == topItemModeSelection[0]) {
+      <ng-template *ngTemplateOutlet="tracks"></ng-template>
+    } @else if (topItemMode == topItemModeSelection[1]) {
+      <ng-template *ngTemplateOutlet="artists"></ng-template>
+    }
+  } @else {
+    <div>
+      Loading...
+    </div>
+  }
+  <div></div>
+</div>
+
+<ng-template #tracks>
+  @for (track of topTracks; track track.id; let index = $index) {
+    <div>
+      {{index + 1}}. {{track.name}} - {{track.album.name}}
+    </div>
+  } @empty {
+    <div>No tracks.</div>
+  }
+</ng-template>
+
+<ng-template #artists>
+  @for (artist of topArtists; track artist.id; let index = $index) {
+    <div>
+      {{index + 1}}. {{artist.name}}
+    </div>
+  } @empty {
+    <div>No artists.</div>
+  }
+</ng-template>

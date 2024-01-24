@@ -7,23 +7,33 @@ export interface UserTopItems {
   total: number;
   next: string;
   previous: string;
-  items: Artist[] | Track[];
 }
 
-export interface Artist {
+export interface UserTopTracks extends UserTopItems {
+  items: Track[];
+}
+
+export interface UserTopArtists extends UserTopItems {
+  items: Artist[];
+}
+
+export interface Item {
   external_urls: ExternalUrls;
-  followers: Followers;
-  genres: string[];
   href: string;
   id: string;
-  images: Image[];
   name: string;
   popularity: number;
   type: string;
   uri: string;
 }
 
-export interface Track {
+export interface Artist extends Item {
+  followers: Followers;
+  genres: string[];
+  images: Image[];
+}
+
+export interface Track extends Item {
   album: Album;
   artists: Artist[];
   available_markets: string[];
@@ -31,18 +41,11 @@ export interface Track {
   duration_ms: number;
   explicit: boolean;
   external_ids: ExternalIds;
-  external_urls: ExternalUrls;
-  href: string;
-  id: string;
   is_playable: boolean;
   linked_from: LinkedFrom;
   restrictions: Restriction;
-  name: string;
-  popularity: number;
   preview_url: string;
   track_number: number;
-  type: string;
-  uri: string;
   is_local: boolean;
 }
 

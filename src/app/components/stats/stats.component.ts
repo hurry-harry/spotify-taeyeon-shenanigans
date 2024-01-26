@@ -106,7 +106,7 @@ export class StatsComponent implements OnInit {
 
   calculateTopAlbums(): void {
     this.topTracks.forEach((track: Track) => {
-      let albumIndex = this.topAlbums.findIndex(x => x.album.id === track.album.id);
+      const albumIndex = this.topAlbums.findIndex(x => x.album.id === track.album.id);
       if (albumIndex === -1) {
         this.topAlbums.push({ album: track.album, count: 1 });
       } else {

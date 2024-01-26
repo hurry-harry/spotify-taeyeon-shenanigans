@@ -17,7 +17,9 @@
     @if (topItemMode == topItemModeSelection[0]) {
       <ng-template *ngTemplateOutlet="tracks"></ng-template>
     } @else if (topItemMode == topItemModeSelection[1]) {
-      <ng-template *ngTemplateOutlet="artists"></ng-template>
+      <div class="container__artist">
+        <ng-template *ngTemplateOutlet="artists"></ng-template>
+      </div>
     }
   } @else {
     <div>
@@ -28,8 +30,8 @@
 
 <ng-template #tracks>
   @for (track of topTracks; track track.id; let index = $index) {
-    <div class="card card__track">
-      <h2 class="card__track__index">{{index + 1}}.</h2>
+    <div class="card card__track" (click)="openItemUrl(track)">
+      <h2 class="card__track__index">#{{index + 1}}</h2>
       <img alt="album cover" class="card__track__album-cover" src="{{track.album.images[0].url}}">
       <div class="card__track__text">
         <div>
@@ -47,8 +49,9 @@
 
 <ng-template #artists>
   @for (artist of topArtists; track artist.id; let index = $index) {
-    <div>
-      {{index + 1}}. {{artist.name}}
+    <div class="card card__artist" (click)="openItemUrl(artist)">
+      <img alt="artist picture" class="card__artist__profile-picture" src="{{artist.images[0].url}}">
+      <h3 class="card__artist__name">#{{index + 1}} - {{artist.name}}</h3>
     </div>
   } @empty {
     <div>No artists.</div>

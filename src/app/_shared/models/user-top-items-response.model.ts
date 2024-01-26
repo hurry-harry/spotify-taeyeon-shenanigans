@@ -92,3 +92,8 @@ export interface LinkedFrom {
   type: string;
   uri: string;
 }
+
+export interface TopAlbumItem {
+  album: Album;
+  count: number;
+}

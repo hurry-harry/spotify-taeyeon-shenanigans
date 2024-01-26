@@ -15,11 +15,13 @@
 
   @if (!isLoading) {
     @if (topItemMode == topItemModeSelection[0]) {
-      <ng-template *ngTemplateOutlet="tracks"></ng-template>
-    } @else if (topItemMode == topItemModeSelection[1]) {
       <div class="container__artist">
         <ng-template *ngTemplateOutlet="artists"></ng-template>
       </div>
+    } @else if (topItemMode == topItemModeSelection[1]) {
+      <ng-template *ngTemplateOutlet="albums"></ng-template>
+    } @else if (topItemMode == topItemModeSelection[2]) {
+      <ng-template *ngTemplateOutlet="tracks"></ng-template>
     }
   } @else {
     <div>
@@ -55,5 +57,24 @@
     </div>
   } @empty {
     <div>No artists.</div>
+  }
+</ng-template>
+
+<ng-template #albums>
+  @for (album of topAlbums; track album.album.id; let index = $index) {
+    <div class="card card__track" (click)="openAlbumUrl(album.album)">
+      <h2 class="card__track__index">#{{index + 1}}</h2>
+      <img alt="album cover" class="card__track__album-cover" src="{{album.album.images[0].url}}">
+      <div class="card__track__text">
+        <div>
+          {{album.album.artists[0].name}} - {{album.album.name}}
+        </div>
+        <div>
+          {{album.album.album_type | titlecase | singleEP }}
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div>No albums.</div>
   }
 </ng-template>

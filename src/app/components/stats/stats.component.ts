@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
-import { Artist, Track, UserTopArtists, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
+import { Artist, Item, Track, UserTopArtists, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
 import { concatMap, finalize } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-stats',
@@ -87,5 +88,9 @@ export class StatsComponent implements OnInit {
       this.topItemMode = mode;
       this.updateTopItems();
     }
+  }
+
+  openItemUrl(item: Item): void {
+    window.open(item.external_urls.spotify, "_blank");
   }
 }

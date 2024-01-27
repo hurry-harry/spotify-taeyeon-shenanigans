@@ -97,3 +97,8 @@ export interface TopAlbumItem {
   album: Album;
   count: number;
 }
+
+export interface TopArtistsByTrack {
+  artist: Artist;
+  count: number;
+}

@@ -23,7 +23,7 @@ export class HomeComponent implements OnInit {
       this.playCard = {
         imageSource: "/assets/headphones.png",
         title: "Play Heardle",
-        description: "Test your knowledge on how well you know your songs!",
+        description: "Test your knowledge on how well you know your fave songs!",
         url: "play"
       };
 

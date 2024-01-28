@@ -27,3 +27,12 @@ html {
     border: 0px;  
   }
 }
+
+
+.ng-select .ng-has-value .ng-placeholder {
+  display: none;
+}
+
+.ng-select .ng-select-container .ng-value-container .ng-input>input {
+  color: #eeeeee;
+}

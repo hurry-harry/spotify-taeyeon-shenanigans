@@ -3,11 +3,14 @@ import { Artist, TopArtistsByTrack, Track, UserTopItems, UserTopTracks } from '.
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
 import { concatMap, finalize } from 'rxjs';
+import { CommonModule } from '@angular/common';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [],
+  imports: [NgSelectModule, CommonModule, FormsModule],
   templateUrl: './play.component.html',
   styleUrl: './play.component.scss'
 })
@@ -15,7 +18,7 @@ export class PlayComponent implements OnInit {
   isLoading: boolean = false;
 
   isHardMode: boolean = false;
-  specificArtist!: string;
+  specificArtist!: Artist;
 
   timeRanges: string[] = [ "short_term", "medium_term", "long_term" ];
 
@@ -55,13 +58,13 @@ export class PlayComponent implements OnInit {
           // handle medium term 2
           this.appendTopTracks((response as UserTopTracks).items);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 49, "tracks");
+          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 0, "tracks");
         }),
         concatMap((response: UserTopItems) => {
           // handle long term 1
           this.appendTopTracks((response as UserTopTracks).items);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[1], 0, "tracks");
+          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 49, "tracks");
         }),
         finalize(() => {
           // 
@@ -92,8 +95,8 @@ export class PlayComponent implements OnInit {
     });
 
     this.topArtistsByTrackMap.forEach((artist: TopArtistsByTrack) => {
-      if (artist.count < 15) {
-        this.topArtistsByTrackMap.delete(artist.artist.id);
+      if (artist.count >= 15) {
+        this.specificArtistSelection.push(artist.artist);
       }
     });
   }

@@ -84,6 +84,11 @@
   &__submit {
     margin-left: 10px;
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
 }
 
 .autocomplete {
@@ -111,5 +116,9 @@
     background-color: #eeeeee;
     color: #212226;
     font-weight: bold;
+
+    &--hover {
+      background-color: #a3a3a3;
+    }
   }
 }

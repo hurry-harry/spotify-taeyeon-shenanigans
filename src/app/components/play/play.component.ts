@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgZone, OnInit, WritableSignal, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, WritableSignal, signal } from '@angular/core';
 import { Artist, TopArtistsByTrack, Track, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
@@ -16,6 +16,8 @@ import { NUMBER_OF_SONGS } from '../../_shared/constants/settings.constants';
   styleUrl: './play.component.scss'
 })
 export class PlayComponent implements OnInit {
+  @ViewChild("autocompleteContainer", { read: ElementRef }) autocompleteContainer!: ElementRef;
+
   timeRanges: string[] = [ "short_term", "medium_term", "long_term" ];
 
   isLoading: boolean = false;
@@ -38,16 +40,18 @@ export class PlayComponent implements OnInit {
 
   filteredTracks: Track[] = [];
   filter: string = "";
+  selectedAnswer: Track | null = null;
+  
+  hoverIndex: number = -1;
 
   hasFilteredTracksSignal: WritableSignal<boolean> = signal(false);
   isFocusedSignal: WritableSignal<boolean> = signal(this.isFocused);
   filteredTracksSignal: WritableSignal<Track[]> = signal([]);
 
   constructor(
-    private changeDetector: ChangeDetectorRef,
+    private elementRef: ElementRef,
     private spotifyService: SpotifyService,
-    private userService: UserService,
-    private zone: NgZone) {
+    private userService: UserService) {
   }
 
   ngOnInit(): void {
@@ -144,11 +148,12 @@ export class PlayComponent implements OnInit {
     // }
 
     this.quizSongs = this.getRandomSongs(this.quizSelection, NUMBER_OF_SONGS);
+    console.log('quizSongs', this.quizSongs);
   }
 
   getRandomSongs(tracks: Track[], size: number): Track[] {
-    let result: Track[] = [];
-    let taken: number[] = [];
+    const result: Track[] = [];
+    const taken: number[] = [];
     let length: number = tracks.length;
 
     while(size--) {
@@ -160,6 +165,13 @@ export class PlayComponent implements OnInit {
     return result;
   }
 
+  selectAnswer(index: number): void {
+    this.isFocused = false;
+    this.isFocusedSignal.set(this.isFocused);
+    this.selectedAnswer = this.filteredTracks[index];
+    this.filter = `${this.filteredTracks[index].name} - ${this.filteredTracks[index].artists[0].name}`;
+  }
+
   submitAnswer(): void {
     this.isTrackPlaying = false;
   }
@@ -168,51 +180,107 @@ export class PlayComponent implements OnInit {
     this.isTrackPlaying = !this.isTrackPlaying;
   }
 
-  filterTracks(event: Event): void {
+  handleKeyUp(event: Event): void {
+    const key: KeyboardEvent = event as KeyboardEvent;
 
-    const filterTerms: string[] = (event.target as HTMLInputElement).value.split(' ');
+    if (this.filter.length > 0 && this.selectedAnswer) {
+      this.submitAnswer();
+    } else {
+      switch (key.key) {
+        case "ArrowUp": 
+          if (this.hoverIndex != 0) {
+            console.log('pre', this.hoverIndex);
+            this.hoverIndex--;
+            console.log('post', this.hoverIndex);
+            this.scrollTo();
+          }
+          break;
+        case "ArrowDown":
+          if (this.hoverIndex < this.filteredTracks.length - 1) {
+            this.hoverIndex++;
+            this.scrollTo();
+          }
+          break;
+        case "Enter":
+          if (this.hoverIndex >= 0) {
+            this.selectAnswer(this.hoverIndex);
+          }
+          break;
+        default:
+          this.selectedAnswer = null;
+          this.filterTracks();
+          break;
+      }
+    }
+  }
 
-    filterTerms.forEach((term: string) => {
-      const temp: Track[] = [];
+  scrollTo() {
+    if (this.hoverIndex != -1) {
+      const scrollTo = document.getElementById('track-' + this.hoverIndex);
+      if (scrollTo) {
+        scrollTo.scrollIntoView(true);
+      }
+    }
+  }
 
+  filterTracks(): void {
+    const filterTerms: string[] = this.filter.split(' ');
+
+    if (this.filter === "" || this.filter === null) {
+      this.filteredTracks = [];
+    } else {
+      this.isFocused = true;
+      this.isFocusedSignal.set(this.isFocused);
+
+      this.filteredTracks = [];
       this.quizSelection.forEach((track: Track) => {
-        if (track.name.toLocaleLowerCase().includes(term)) {
-          temp.push(track);
-        }
-      });
+        const hasArtist: boolean = filterTerms.some((term: string) => this.artistsToStr(track.artists).includes(term));
+        const hasTrackName: boolean = filterTerms.some((term: string) => track.name.includes(term));
 
-      this.filteredTracks = temp;
+        if (hasArtist || hasTrackName)
+          this.filteredTracks.push(JSON.parse(JSON.stringify(track)));
+
+      });
+    }
+  }
+
+  artistsToStr(artists: Artist[]): string {
+    let result: string = "";
+
+    artists.forEach((artist: Artist) => {
+      result = result.concat(artist.name, " ");
     });
 
-    if (this.filteredTracks. length > 0)
-      this.hasFilteredTracksSignal.set(true);
+    return result.toLocaleLowerCase();
+  }
 
-    // this.filter = (event.target as HTMLInputElement).value;
-    
-    // let newFiltered: Track[] = this.quizSelection.filter((track: Track) => track.name.includes(this.filter));
+  compareArtistsOnTrack(artists: Artist[], term: string): boolean {
+    let allArtists: string = "";
 
-    // let newArray: Track[] = newFiltered.map((track: Track) => Object.assign({}, track));
-    // this.filteredTracksSignal.set(newArray);
+    artists.forEach((artist: Artist) => {
+      allArtists = allArtists.concat(artist.name, " ");
+    });
 
-    // this.filteredTracksSignal.set(this.quizSelection);
-    // this.filteredTracksSignal.update((prev: Track[]) => [
-    //   ...prev.filter((x: Track) => x.name.includes(this.filter))
-    // ]);
+    if (allArtists.includes(term))
+      return true;
 
-    // this.zone.run(() => {
-    //   this.filter = (event.target as HTMLInputElement).value;
-    //   this.filteredTracks = [...this.quizSelection.filter((x: Track) => x.name.includes(this.filter))];
-    //   this.filteredTracksSignal.set(this.filteredTracks);
-    //   this.changeDetector.detectChanges();
-    // });
-
-    // this.filter = (event.target as HTMLInputElement).value;
-    // this.filteredTracks = [...this.quizSelection.filter((x: Track) => x.name.includes(this.filter))];
-    // this.filteredTracksSignal.set(this.filteredTracks);
+    return false
   }
 
   toggleFocused(): void {
     this.isFocused = !this.isFocused;
     this.isFocusedSignal.set(this.isFocused);
+  }
+
+  @HostListener('document:click', ['$event.target'])
+  documentClick(targetElement: any): void {
+    const isInside: boolean = this.autocompleteContainer.nativeElement.contains(targetElement);
+
+    if (!isInside) {
+      console.log('outside');
+      this.isFocused = false;
+      this.isFocusedSignal.set(this.isFocused);
+      this.hoverIndex = -1;
+    }
   }
 }

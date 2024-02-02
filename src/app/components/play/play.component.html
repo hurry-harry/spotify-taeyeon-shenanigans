@@ -81,23 +81,20 @@
     </div>
   </div>
   <div class="container__row container__row__submit">
-    <div class="autocomplete">
-      <input placeholder="Song title..." [ngClass]="(isFocusedSignal() ? 'quiz__input quiz__input--focused' : 'quiz__input')"
-        class="quiz__input" (change)="filterTracks($event)" (focus)="toggleFocused()" (blur)="toggleFocused()">
-      @if (isFocusedSignal() && hasFilteredTracksSignal()) {
-        <ng-template *ngTemplateOutlet="autoComplete"></ng-template>
+    <div id="autocomplete-container" #autocompleteContainer class="autocomplete">
+      <input [(ngModel)]="filter" placeholder="Song title..." [ngClass]="(isFocusedSignal() ? 'quiz__input quiz__input--focused' : 'quiz__input')"
+        class="quiz__input" (keyup)="handleKeyUp($event)" (focus)="filterTracks()">
+      @if (isFocusedSignal()) {
+        <div class="autocomplete__container">
+          @for (track of filteredTracks; track track.id; let index = $index) {
+            <div id="track-{{index}}" (keypress)="selectAnswer(index)" (click)="selectAnswer(index)" tabindex="0"
+              (mouseenter)="hoverIndex = index" class="autocomplete__track" [ngClass]="(hoverIndex === index ? 'autocomplete__track--hover' : '')">
+              {{track.name}} - {{track.artists[0].name}}
+            </div>
+          }
+        </div>
       }
     </div>
-    <button class="btn btn__submit" (click)="submitAnswer()">Submit</button>
-  </div>
-</ng-template>
-
-<ng-template #autoComplete>
-  <div class="autocomplete__container">
-    @for (track of filteredTracks; track track.id; let index = $index) {
-      <div class="autocomplete__track">
-        {{track.name}} - {{track.artists[0].name}}
-      </div>
-    }
+    <button [disabled]="!selectedAnswer" class="btn btn__submit" (click)="submitAnswer()">Submit</button>
   </div>
 </ng-template>

@@ -49,7 +49,6 @@ export class PlayComponent implements OnInit {
   filteredTracksSignal: WritableSignal<Track[]> = signal([]);
 
   constructor(
-    private elementRef: ElementRef,
     private spotifyService: SpotifyService,
     private userService: UserService) {
   }
@@ -59,31 +58,26 @@ export class PlayComponent implements OnInit {
     this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[0], 0, "tracks")
       .pipe(
         concatMap((response: UserTopItems) => {
-          // handle short term 1
           this.appendTopTracks((response as UserTopTracks).items);
           
           return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[0], 49, "tracks");
         }),
         concatMap((response: UserTopItems) => {
-          // handle short term 2
           this.appendTopTracks((response as UserTopTracks).items);
 
           return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[1], 0, "tracks");
         }),
         concatMap((response: UserTopItems) => {
-          // handle medium term 1
           this.appendTopTracks((response as UserTopTracks).items);
 
           return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[1], 49, "tracks");
         }),
         concatMap((response: UserTopItems) => {
-          // handle medium term 2
           this.appendTopTracks((response as UserTopTracks).items);
 
           return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 0, "tracks");
         }),
         concatMap((response: UserTopItems) => {
-          // handle long term 1
           this.appendTopTracks((response as UserTopTracks).items);
 
           return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 49, "tracks");
@@ -93,7 +87,6 @@ export class PlayComponent implements OnInit {
           this.isLoading = false;
         })
       ). subscribe((response: UserTopItems) => {
-        // handle long term 2
         this.appendTopTracks((response as UserTopTracks).items);
       });
   }
@@ -141,11 +134,6 @@ export class PlayComponent implements OnInit {
     } else {
       this.quizSelection = [...this.topTracksMap.values()];
     }
-
-    // for playing again
-    // if (this.quizSongs.length > 0) {
-    //   // remove songs already in this.quizSongs from quizSelection
-    // }
 
     this.quizSongs = this.getRandomSongs(this.quizSelection, NUMBER_OF_SONGS);
     console.log('quizSongs', this.quizSongs);
@@ -232,15 +220,17 @@ export class PlayComponent implements OnInit {
       this.isFocused = true;
       this.isFocusedSignal.set(this.isFocused);
 
-      this.filteredTracks = [];
-      this.quizSelection.forEach((track: Track) => {
-        const hasArtist: boolean = filterTerms.some((term: string) => this.artistsToStr(track.artists).includes(term));
-        const hasTrackName: boolean = filterTerms.some((term: string) => track.name.includes(term));
+      this.filteredTracks = this.quizSelection;
+      for(let i: number = 0; i < filterTerms.length; i++) {
+        const temp: Track[] = [];
+        
+        for(let j: number = 0; j < this.filteredTracks.length; j++) {
+          if (this.filteredTracks[j].name.toLowerCase().includes(filterTerms[i]) || this.artistsToStr(this.filteredTracks[j].artists).includes(filterTerms[i]))
+            temp.push(JSON.parse(JSON.stringify(this.filteredTracks[j])));
+        }
 
-        if (hasArtist || hasTrackName)
-          this.filteredTracks.push(JSON.parse(JSON.stringify(track)));
-
-      });
+        this.filteredTracks = temp;
+      }
     }
   }
 
@@ -251,7 +241,7 @@ export class PlayComponent implements OnInit {
       result = result.concat(artist.name, " ");
     });
 
-    return result.toLocaleLowerCase();
+    return result.toLowerCase();
   }
 
   compareArtistsOnTrack(artists: Artist[], term: string): boolean {
@@ -277,7 +267,6 @@ export class PlayComponent implements OnInit {
     const isInside: boolean = this.autocompleteContainer.nativeElement.contains(targetElement);
 
     if (!isInside) {
-      console.log('outside');
       this.isFocused = false;
       this.isFocusedSignal.set(this.isFocused);
       this.hoverIndex = -1;

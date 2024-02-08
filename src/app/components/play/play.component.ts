@@ -265,7 +265,6 @@ export class PlayComponent implements OnInit {
     this.isTrackPlaying = !this.isTrackPlaying;
     this.musicPlayer.nativeElement.load();
 
-    // checks if the player is truly paused, avoids issues between play and pause states of the player
     const isReadyToPlay: boolean = !(this.musicPlayer.nativeElement.currentTime > 0 && !this.musicPlayer.nativeElement.paused
       && !this.musicPlayer.nativeElement.ended && this.musicPlayer.nativeElement.readyState > this.musicPlayer.nativeElement.HAVE_CURRENT_DATA);
 
@@ -299,27 +298,20 @@ export class PlayComponent implements OnInit {
       if (fromPause) {
         if (this.musicPlayer.nativeElement.volume > 0.0) {
           try {
-            // VOLUME NOT GETTING DECREMENTED. FIND OUT WHY
-            console.log(this.musicPlayer.nativeElement.volume - VOLUME_DECREMENTER, this.musicPlayer.nativeElement.volume, VOLUME_DECREMENTER);
             this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
-            console.log('post', this.musicPlayer.nativeElement.volume);
           } catch {
-            console.log('pause1');
             clearInterval(fadeOut);
             this.musicPlayer.nativeElement.pause();
             this.musicPlayer.nativeElement.currentTime = 0;
           }
         } else if (this.musicPlayer.nativeElement.volume <= 0.0) {
-          console.log('pause2');
           clearInterval(fadeOut);
         }
       } else {
         if (this.musicPlayer.nativeElement.currentTime >= this.quizSettings.trackDuration && this.musicPlayer.nativeElement.volume > 0) {
           try {
-            console.log('dec2');
             this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
           } catch {
-            console.log('pause3');
             clearInterval(fadeOut);
             this.isTrackPlaying = false;
             this.musicPlayer.nativeElement.pause();

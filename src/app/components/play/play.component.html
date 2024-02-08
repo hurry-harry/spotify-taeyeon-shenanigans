@@ -59,11 +59,14 @@
       <span class="quiz__index">{{ quizIndex + 1 }}</span>
     </div>
     <div class="container__row__right-section">
-      <span class="quiz__timer">{{quizTimer}}</span>
+      <span class="quiz__timer">{{quizSettings.timer}}</span>
     </div>
   </div>
   <div class="container__row audio__wave audio__controls">
-    <div class="audio-wave">
+    <audio controls #musicPlayer class="music-player">
+      <source src="{{quizSongs[quizIndex].preview_url}}" allow="autoplay" type="audio/mpeg">
+    </audio>
+    <div (click)="toggleAudio()" class="audio-wave">
       <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
       <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
       <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
@@ -77,7 +80,7 @@
       <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
     </div>
     <div>
-      <button class="btn btn__play" (click)="togglePlayTrack()">Play</button>
+      <button class="btn btn__play" (click)="toggleAudio()">{{isTrackPlaying ? 'Pause' : 'Play'}}</button>
     </div>
   </div>
   <div class="container__row container__row__submit">

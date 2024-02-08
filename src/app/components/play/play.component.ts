@@ -6,7 +6,8 @@ import { concatMap, finalize } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
-import { NUMBER_OF_SONGS } from '../../_shared/constants/settings.constants';
+import { HARD_MODE_DURATION, HARD_MODE_TIMER, NORMAL_DURATION, NORMAL_TIMER, NUMBER_OF_SONGS, VOLUME_DECREMENTER, VOLUME_INCREMENTER } from '../../_shared/constants/settings.constants';
+import { QuizSettings } from '../../_shared/models/quiz.model';
 
 @Component({
   selector: 'app-play',
@@ -16,14 +17,14 @@ import { NUMBER_OF_SONGS } from '../../_shared/constants/settings.constants';
   styleUrl: './play.component.scss'
 })
 export class PlayComponent implements OnInit {
-  @ViewChild("autocompleteContainer", { read: ElementRef }) autocompleteContainer!: ElementRef;
+  @ViewChild("autocompleteContainer", { read: ElementRef }) autocompleteContainer?: ElementRef;
+  @ViewChild("musicPlayer", { read: ElementRef }) musicPlayer!: ElementRef;
 
   timeRanges: string[] = [ "short_term", "medium_term", "long_term" ];
 
   isLoading: boolean = false;
   isPlaying: boolean = false;
   isFocused: boolean = false;
-  isTrackCountEnough: boolean = true;
   isHardMode: boolean = false;
   isTrackPlaying: boolean = false;
 
@@ -33,16 +34,18 @@ export class PlayComponent implements OnInit {
   specificArtist!: Artist;
   specificArtistSelection: Artist[] = [];
 
+  quizSettings: QuizSettings = { trackDuration: NORMAL_DURATION, timer: NORMAL_TIMER };
   quizSelection: Track[] = [];
   quizSongs: Track[] = [];
   quizIndex: number = 0;
-  quizTimer: number = 0;
 
   filteredTracks: Track[] = [];
   filter: string = "";
   selectedAnswer: Track | null = null;
   
   hoverIndex: number = -1;
+
+  volume: number = 0.3;
 
   hasFilteredTracksSignal: WritableSignal<boolean> = signal(false);
   isFocusedSignal: WritableSignal<boolean> = signal(this.isFocused);
@@ -120,10 +123,12 @@ export class PlayComponent implements OnInit {
   }
 
   play(): void {
+    if (this.isHardMode)
+      this.quizSettings = { trackDuration: HARD_MODE_DURATION, timer: HARD_MODE_TIMER };
+
     this.getQuizSongs();
     this.quizIndex = 0;
     this.isPlaying = true;
-    this.quizTimer = 20;
   }
 
   getQuizSongs(): void {
@@ -136,7 +141,6 @@ export class PlayComponent implements OnInit {
     }
 
     this.quizSongs = this.getRandomSongs(this.quizSelection, NUMBER_OF_SONGS);
-    console.log('quizSongs', this.quizSongs);
   }
 
   getRandomSongs(tracks: Track[], size: number): Track[] {
@@ -164,10 +168,6 @@ export class PlayComponent implements OnInit {
     this.isTrackPlaying = false;
   }
 
-  togglePlayTrack(): void {
-    this.isTrackPlaying = !this.isTrackPlaying;
-  }
-
   handleKeyUp(event: Event): void {
     const key: KeyboardEvent = event as KeyboardEvent;
 
@@ -177,9 +177,7 @@ export class PlayComponent implements OnInit {
       switch (key.key) {
         case "ArrowUp": 
           if (this.hoverIndex != 0) {
-            console.log('pre', this.hoverIndex);
             this.hoverIndex--;
-            console.log('post', this.hoverIndex);
             this.scrollTo();
           }
           break;
@@ -225,23 +223,13 @@ export class PlayComponent implements OnInit {
         const temp: Track[] = [];
         
         for(let j: number = 0; j < this.filteredTracks.length; j++) {
-          if (this.filteredTracks[j].name.toLowerCase().includes(filterTerms[i]) || this.artistsToStr(this.filteredTracks[j].artists).includes(filterTerms[i]))
+          if (this.filteredTracks[j].name.toLowerCase().includes(filterTerms[i]) || this.spotifyService.artistsToStr(this.filteredTracks[j].artists).includes(filterTerms[i]))
             temp.push(JSON.parse(JSON.stringify(this.filteredTracks[j])));
         }
 
         this.filteredTracks = temp;
       }
     }
-  }
-
-  artistsToStr(artists: Artist[]): string {
-    let result: string = "";
-
-    artists.forEach((artist: Artist) => {
-      result = result.concat(artist.name, " ");
-    });
-
-    return result.toLowerCase();
   }
 
   compareArtistsOnTrack(artists: Artist[], term: string): boolean {
@@ -264,7 +252,7 @@ export class PlayComponent implements OnInit {
 
   @HostListener('document:click', ['$event.target'])
   documentClick(targetElement: any): void {
-    const isInside: boolean = this.autocompleteContainer.nativeElement.contains(targetElement);
+    const isInside: boolean = this.autocompleteContainer?.nativeElement.contains(targetElement);
 
     if (!isInside) {
       this.isFocused = false;
@@ -272,4 +260,75 @@ export class PlayComponent implements OnInit {
       this.hoverIndex = -1;
     }
   }
+
+  toggleAudio(): void {
+    this.isTrackPlaying = !this.isTrackPlaying;
+    this.musicPlayer.nativeElement.load();
+
+    // checks if the player is truly paused, avoids issues between play and pause states of the player
+    const isReadyToPlay: boolean = !(this.musicPlayer.nativeElement.currentTime > 0 && !this.musicPlayer.nativeElement.paused
+      && !this.musicPlayer.nativeElement.ended && this.musicPlayer.nativeElement.readyState > this.musicPlayer.nativeElement.HAVE_CURRENT_DATA);
+
+    if (this.isTrackPlaying && isReadyToPlay) {
+      this.musicPlayer.nativeElement.play();
+      this.audioFadeIn();
+      this.audioFadeOut();
+    } else if (!this.isTrackPlaying) {
+      this.audioFadeOut(true);
+    }
+  }
+
+  audioFadeIn(): void {
+    this.musicPlayer.nativeElement.volume = 0;
+
+    const fadeIn = setInterval(() => {
+      if (this.musicPlayer.nativeElement.currentTime >= 0.0 && this.musicPlayer.nativeElement.volume < this.volume) {
+        try {
+          this.musicPlayer.nativeElement.volume += VOLUME_INCREMENTER;
+        } catch {
+          clearInterval(fadeIn);
+        }
+      } else if (this.musicPlayer.nativeElement.volume >= this.volume) {
+        clearInterval(fadeIn);
+      }
+    }, 100);
+  }
+
+  audioFadeOut(fromPause: boolean = false): void {
+    const fadeOut = setInterval(() => {
+      if (fromPause) {
+        if (this.musicPlayer.nativeElement.volume > 0.0) {
+          try {
+            // VOLUME NOT GETTING DECREMENTED. FIND OUT WHY
+            console.log(this.musicPlayer.nativeElement.volume - VOLUME_DECREMENTER, this.musicPlayer.nativeElement.volume, VOLUME_DECREMENTER);
+            this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
+            console.log('post', this.musicPlayer.nativeElement.volume);
+          } catch {
+            console.log('pause1');
+            clearInterval(fadeOut);
+            this.musicPlayer.nativeElement.pause();
+            this.musicPlayer.nativeElement.currentTime = 0;
+          }
+        } else if (this.musicPlayer.nativeElement.volume <= 0.0) {
+          console.log('pause2');
+          clearInterval(fadeOut);
+        }
+      } else {
+        if (this.musicPlayer.nativeElement.currentTime >= this.quizSettings.trackDuration && this.musicPlayer.nativeElement.volume > 0) {
+          try {
+            console.log('dec2');
+            this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
+          } catch {
+            console.log('pause3');
+            clearInterval(fadeOut);
+            this.isTrackPlaying = false;
+            this.musicPlayer.nativeElement.pause();
+            this.musicPlayer.nativeElement.currentTime = 0;
+          }
+        }
+      }
+    }, 100);
+  }
 }
+
+

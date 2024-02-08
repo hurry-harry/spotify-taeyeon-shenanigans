@@ -96,8 +96,10 @@ export class PlayComponent implements OnInit {
 
   appendTopTracks(topTracks: Track[]): void {
     topTracks.forEach((track: Track) => {
-      if (!this.topTracksMap.has(track.id)) {
-        this.topTracksMap.set(track.id, track);
+
+      const titleArtistsStr = track.name.concat(this.spotifyService.artistsToStr(track.artists));
+      if (track.preview_url && !this.topTracksMap.has(titleArtistsStr)) {
+        this.topTracksMap.set(titleArtistsStr, track);
       }
     });
   }

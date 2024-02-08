@@ -1,31 +1,103 @@
 <div class="container">
-  play here
-
-  @if (!isLoading) {
-    <div class="container__row">
-      <div>
-        <h2>Hard Mode</h2>
-        <p>1 try per song and clip length is 2 seconds</p>
-      </div>
-      <div>
-        
-      </div>
-    </div>
-  
-    <div class="container__row">
-      <div class="container__row__left-section">
-        <h2>Specific Artist Only</h2>
-        <p>Choose one artist from your most played (only your artists with at least 15 tracks are allowed)</p>
-      </div>
-      <div class="container__row__right-section">
-        <ng-select [(ngModel)]="specificArtist" [items]="specificArtistSelection" placeholder="Search..." [searchable]="true" bindLabel="name"
-          [clearable]="true">
-        </ng-select>
-      </div>
-    </div>
-  
-    <button (click)="play()">
-      Play
-    </button>
+  @if (isLoading) {
+    loading...
+  } @else {
+    @if (isPlaying) {
+      <ng-template *ngTemplateOutlet="playMode"></ng-template>
+    } @else {
+      <ng-template *ngTemplateOutlet="playSettings"></ng-template>
+    }
   }
 </div>
+
+<ng-template #playSettings>
+  <div class="container__row">
+    <div class="container__row__left-section">
+      <h2>Hard Mode</h2>
+      <p class="container__row__left-section__sub-text">
+        - One try per song and clip length is 2s instead of 5s.
+        <br><br>
+        - Time to guess is 10s instead of 20s
+      </p>
+    </div>
+    <div class="container__row__right-section">
+      <div class="right-option vert-align-top">
+        <label class="switch">
+          <input type="checkbox" (change)="toggleHardMode($event)"/>
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="container__row">
+    <div class="container__row__left-section">
+      <h2>Specific Artist Only</h2>
+      <p class="container__row__left-section__sub-text">
+        - Select an artist you'd like to play with just one artist.
+        <br><br>
+        - Only your artists with at least 15 tracks are allowed.
+      </p>
+    </div>
+    <div class="container__row__right-section">
+      <ng-select class="dropdown" [(ngModel)]="specificArtist" [items]="specificArtistSelection" placeholder="Search..." [searchable]="true" bindLabel="name"
+        [clearable]="true">
+      </ng-select>
+    </div>
+  </div>
+  <div class="container__row">
+    <button class="btn btn__play" (click)="play()">
+      Play
+    </button>
+  </div>
+</ng-template>
+
+<ng-template #playMode>
+  <div class="container__row">
+    <div class="container__row__left-section">
+      <span>#</span>
+      <span class="quiz__index">{{ quizIndex + 1 }}</span>
+    </div>
+    <div class="container__row__right-section">
+      <span class="quiz__timer">{{quizSettings.timer}}</span>
+    </div>
+  </div>
+  <div class="container__row audio__wave audio__controls">
+    <audio controls #musicPlayer class="music-player">
+      <source src="{{quizSongs[quizIndex].preview_url}}" allow="autoplay" type="audio/mpeg">
+    </audio>
+    <div (click)="toggleAudio()" class="audio-wave">
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+      <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
+    </div>
+    <div>
+      <button class="btn btn__play" (click)="toggleAudio()">{{isTrackPlaying ? 'Pause' : 'Play'}}</button>
+    </div>
+  </div>
+  <div class="container__row container__row__submit">
+    <div id="autocomplete-container" #autocompleteContainer class="autocomplete">
+      <input [(ngModel)]="filter" placeholder="Song title..." [ngClass]="(isFocusedSignal() ? 'quiz__input quiz__input--focused' : 'quiz__input')"
+        class="quiz__input" (keyup)="handleKeyUp($event)" (focus)="filterTracks()">
+      @if (isFocusedSignal()) {
+        <div class="autocomplete__container">
+          @for (track of filteredTracks; track track.id; let index = $index) {
+            <div id="track-{{index}}" (keypress)="selectAnswer(index)" (click)="selectAnswer(index)" tabindex="0"
+              (mouseenter)="hoverIndex = index" class="autocomplete__track" [ngClass]="(hoverIndex === index ? 'autocomplete__track--hover' : '')">
+              {{track.name}} - {{track.artists[0].name}}
+            </div>
+          }
+        </div>
+      }
+    </div>
+    <button [disabled]="!selectedAnswer" class="btn btn__submit" (click)="submitAnswer()">Submit</button>
+  </div>
+</ng-template>

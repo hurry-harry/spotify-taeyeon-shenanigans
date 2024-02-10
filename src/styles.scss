@@ -1,4 +1,6 @@
-html {
+@import "assets/sass/styles";
+
+html body {
   background-color: #31364A;
   font-family: Arial, Helvetica, sans-serif;
   color: #eeeeee;
@@ -196,3 +198,5 @@ input:checked + .slider:before {
 .audio-stroke:nth-child(11) {
   animation-delay: random($limit: null)+s;
 }
+
+@import '../node_modules/bootstrap/scss/bootstrap.scss';

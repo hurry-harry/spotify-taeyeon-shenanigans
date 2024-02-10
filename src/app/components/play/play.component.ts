@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, WritableSignal, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, WritableSignal, signal } from '@angular/core';
 import { Artist, TopArtistsByTrack, Track, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
@@ -8,11 +8,13 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { HARD_MODE_DURATION, HARD_MODE_TIMER, NORMAL_DURATION, NORMAL_TIMER, NUMBER_OF_SONGS, VOLUME_DECREMENTER, VOLUME_INCREMENTER } from '../../_shared/constants/settings.constants';
 import { QuizSettings } from '../../_shared/models/quiz.model';
+import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer.modal';
+import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [NgSelectModule, CommonModule, FormsModule],
+  imports: [NgSelectModule, CommonModule, FormsModule, NgbModalModule],
   templateUrl: './play.component.html',
   styleUrl: './play.component.scss'
 })
@@ -38,6 +40,7 @@ export class PlayComponent implements OnInit {
   quizSelection: Track[] = [];
   quizSongs: Track[] = [];
   quizIndex: number = 0;
+  quizScore: number = 0;
 
   filteredTracks: Track[] = [];
   filter: string = "";
@@ -52,6 +55,7 @@ export class PlayComponent implements OnInit {
   filteredTracksSignal: WritableSignal<Track[]> = signal([]);
 
   constructor(
+    private modalService: NgbModal,
     private spotifyService: SpotifyService,
     private userService: UserService) {
   }
@@ -97,9 +101,9 @@ export class PlayComponent implements OnInit {
   appendTopTracks(topTracks: Track[]): void {
     topTracks.forEach((track: Track) => {
 
-      const titleArtistsStr = track.name.concat(this.spotifyService.artistsToStr(track.artists));
-      if (track.preview_url && !this.topTracksMap.has(titleArtistsStr)) {
-        this.topTracksMap.set(titleArtistsStr, track);
+      const trackIdentifier: string = this.spotifyService.buildTrackIdentifier(track.name, this.spotifyService.artistsToStr(track.artists));
+      if (track.preview_url && !this.topTracksMap.has(trackIdentifier)) {
+        this.topTracksMap.set(trackIdentifier, track);
       }
     });
   }
@@ -168,6 +172,16 @@ export class PlayComponent implements OnInit {
 
   submitAnswer(): void {
     this.isTrackPlaying = false;
+    const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistsToStr(this.selectedAnswer!.artists));
+    const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistsToStr(this.quizSongs[this.quizIndex]!.artists));
+
+    if (selectedAnswerStrId === quizAnswerStrId) {
+      console.log('correct');
+      this.quizScore++;
+      this.modalService.open(QuizAnswerModal);
+    } else {
+      // this.nextTrack();
+    }
   }
 
   handleKeyUp(event: Event): void {

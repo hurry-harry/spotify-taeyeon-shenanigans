@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, Input } from "@angular/core";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { Track } from "../../../models/user-top-items-response.model";
 
 @Component({
   standalone: true,
@@ -8,6 +9,8 @@ import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
   styleUrls: ['./quiz-answer.modal.scss'],
 })
 export class QuizAnswerModal {
+  @Input() track!: Track;
+
   activeModal: NgbActiveModal = this.activeModalRef;
 
   constructor(private activeModalRef: NgbActiveModal) { }

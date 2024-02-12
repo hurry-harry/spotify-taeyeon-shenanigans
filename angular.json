@@ -92,6 +92,14 @@
             "styles": [
               "src/styles.scss"
             ],
+            "stylePreprocessorOptions": { 
+              "includePaths": [ 
+                "src",
+                "src/assets/sass",
+                "src/assets/sass/base",
+                "src/assets/sass/components"
+              ]
+            },
             "scripts": []
           }
         },

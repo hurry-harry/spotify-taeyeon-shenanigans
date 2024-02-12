@@ -8,8 +8,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { HARD_MODE_DURATION, HARD_MODE_TIMER, NORMAL_DURATION, NORMAL_TIMER, NUMBER_OF_SONGS, VOLUME_DECREMENTER, VOLUME_INCREMENTER } from '../../_shared/constants/settings.constants';
 import { QuizSettings } from '../../_shared/models/quiz.model';
-import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer.modal';
-import { NgbModal, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
+import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-play',
@@ -178,7 +178,8 @@ export class PlayComponent implements OnInit {
     if (selectedAnswerStrId === quizAnswerStrId) {
       console.log('correct');
       this.quizScore++;
-      this.modalService.open(QuizAnswerModal);
+      const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal);
+      modalRef.componentInstance.track = this.selectedAnswer;
     } else {
       // this.nextTrack();
     }

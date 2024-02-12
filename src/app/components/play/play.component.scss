@@ -1,15 +1,17 @@
-.container {
+@use '../../../assets/sass/base/variables' as *;
+@use '../../../assets/sass/components/buttons' as *;
+
+.play-container {
   margin: 40px auto;
   background-color: #212226;
   color: #eeeeee;
   border-radius: 20px;
   max-width: 800px;
   padding: 50px 32px;
-  height: 400px;
+  height: 450px;
 
   &__row {
     display: flex;
-    margin: 20px 0px 40px;
     align-items: baseline;
 
     &__left-section {
@@ -29,6 +31,10 @@
     &__submit {
       align-items: center;
       justify-content: center;
+    }
+
+    &__audio-row {
+      margin: 20px 0px 40px;
     }
   }
 }

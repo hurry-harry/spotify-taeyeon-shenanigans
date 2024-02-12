@@ -1,19 +1,20 @@
-// Color system
+// custom 
+$taeyeon-white: #eeeeee;
+$taeyeon-gray: #6E7280;
+$taeyeon-dark-gray: #31364A;
 
-$white: #fff;
+// Color system
 $gray-100: #f8f9fa;
 $gray-200: #e9ecef;
 $gray-300: #dee2e6;
 $gray-400: #ced4da;
 $gray-500: #adb5bd;
-$gray-600: #6c757d;
 $gray-700: #495057;
 $gray-800: #343a40;
 $gray-900: #212529;
 $black: #000;
 
 // BOOTSTRAP COLORS TO OVERRIDE
-$midnight: #31364A;
 $blue: #002d47; 
 $indigo: #6610f2;
 $purple: #6f42c1;
@@ -24,15 +25,11 @@ $yellow: #ffe01c;
 $green: #28a745;
 $teal: #20c997;
 $cyan: #17a2b8;
-$light-blue: #cfdbea;
-$lighter-blue: rgba(207, 219, 234, 20%);
 $red-light: #ffc4c5;
 
 // BOOTSTRAP VARIABLE COLORS TO CALL
-$primary: $blue;
-$primary-light: $light-blue;
-$primary-lighter: $lighter-blue;
-$secondary: $gray-600;
+$primary: $taeyeon-dark-gray;
+$secondary: $taeyeon-gray;
 $success: $green;
 $info: $cyan;
 $warning: $yellow;

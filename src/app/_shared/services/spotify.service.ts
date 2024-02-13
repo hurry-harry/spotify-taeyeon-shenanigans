@@ -21,6 +21,7 @@ export class SpotifyService {
     }
     //#endregion
 
+    //#region Helpers
     artistsToStr(artists: Artist[]): string {
         let result: string = "";
     
@@ -30,4 +31,9 @@ export class SpotifyService {
     
         return result.toLowerCase();
     }
+
+    buildTrackIdentifier(trackName: string, artistsStr: string): string {
+        return trackName.concat(artistsStr).toLowerCase();
+    }
+    //#endregion
 }

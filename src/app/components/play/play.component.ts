@@ -44,7 +44,7 @@ export class PlayComponent implements OnInit {
   quizScore: number = 0;
 
   filteredTracks: Track[] = [];
-  filter: string = "";
+  filter: string | null = null;
   selectedAnswer: Track | null = null;
   
   hoverIndex: number = -1;
@@ -176,22 +176,35 @@ export class PlayComponent implements OnInit {
     const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistsToStr(this.selectedAnswer!.artists));
     const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistsToStr(this.quizSongs[this.quizIndex]!.artists));
 
+    let modalRef: NgbModalRef;
+
+    if (this.quizIndex === 4) 
+      modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+    else 
+    modalRef = this.modalService.open(QuizAnswerModal);
+
     if (selectedAnswerStrId === quizAnswerStrId) {
-      console.log('correct');
       this.quizScore++;
-      const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal);
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
     } else {
-      console.log('incorrect');
-      const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal);
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
     }
+
+    modalRef.closed.subscribe(() => {
+      this.selectedAnswer = null;
+      this.filter = null;
+      this.quizIndex++;
+    });
+
+    modalRef.dismissed.subscribe(() => {
+      modalRef.close();
+    })
   }
 
   handleKeyUp(event: Event): void {
     const key: KeyboardEvent = event as KeyboardEvent;
 
-    if (this.filter.length > 0 && this.selectedAnswer) {
+    if (this.filter!.length > 0 && this.selectedAnswer) {
       this.submitAnswer();
     } else {
       switch (key.key) {
@@ -230,7 +243,7 @@ export class PlayComponent implements OnInit {
   }
 
   filterTracks(): void {
-    const filterTerms: string[] = this.filter.split(' ');
+    const filterTerms: string[] = this.filter!.split(' ');
 
     if (this.filter === "" || this.filter === null) {
       this.filteredTracks = [];
@@ -342,5 +355,3 @@ export class PlayComponent implements OnInit {
     }, 100);
   }
 }
-
-

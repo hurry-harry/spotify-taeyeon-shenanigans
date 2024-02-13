@@ -1,7 +1,7 @@
 <div class="result-modal">
   <div class="modal-header" [ngClass]="(result.isCorrect ? 'result-modal--correct' : 'result-modal--incorrect')">
     <h4 class="modal-title">{{result.isCorrect ? 'Correct!' : 'Incorrect!'}}</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+    <button type="button" class="btn-close" aria-label="Close" (click)="close()"></button>
   </div>
   <div class="modal-body d-flex flex-column">
     <div class="pt-0 p-1 mx-auto">

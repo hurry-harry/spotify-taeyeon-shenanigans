@@ -33,9 +33,10 @@ export class QuizAnswerModal implements OnInit {
   }
 
   close(): void {
-    if (this.result.isLastQuestion) 
+    if (this.result.isLastQuestion) {
+      this.activeModal.close('Close click');
       this.router.navigate(['./home']);
-    else 
-      this.activeModal.close('Close click')
+    } else 
+      this.activeModal.close('Close click');
   }
 }

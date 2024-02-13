@@ -1,0 +1,20 @@
+@use '../../../../../assets/sass/base/variables' as *;
+
+.result-modal {
+  color: $taeyeon-black;
+  font-weight: bold;  
+
+  &--correct {
+    background: $green;
+  }
+
+  &--incorrect {
+    background: $red;
+  }
+
+  &__album-cover {
+    height: 175px; //10rem
+    width: 175px;
+    border-radius: 20px;
+  }
+}

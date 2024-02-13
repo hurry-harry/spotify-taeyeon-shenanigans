@@ -8,6 +8,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { HARD_MODE_DURATION, HARD_MODE_TIMER, NORMAL_DURATION, NORMAL_TIMER, NUMBER_OF_SONGS, VOLUME_DECREMENTER, VOLUME_INCREMENTER } from '../../_shared/constants/settings.constants';
 import { QuizSettings } from '../../_shared/models/quiz.model';
+import { QuizResult } from '../../_shared/models/result-modal.model';
 import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 
@@ -179,9 +180,11 @@ export class PlayComponent implements OnInit {
       console.log('correct');
       this.quizScore++;
       const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal);
-      modalRef.componentInstance.track = this.selectedAnswer;
+      (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
     } else {
-      // this.nextTrack();
+      console.log('incorrect');
+      const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal);
+      (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
     }
   }
 

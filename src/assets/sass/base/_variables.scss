@@ -2,6 +2,9 @@
 $taeyeon-white: #eeeeee;
 $taeyeon-gray: #6E7280;
 $taeyeon-dark-gray: #31364A;
+$taeyeon-black: #444444;
+$taeyeon-red: #d9534c;
+$taeyeon-green: #3c8f4f;
 
 // Color system
 $gray-100: #f8f9fa;
@@ -30,10 +33,10 @@ $red-light: #ffc4c5;
 // BOOTSTRAP VARIABLE COLORS TO CALL
 $primary: $taeyeon-dark-gray;
 $secondary: $taeyeon-gray;
-$success: $green;
+$success: $taeyeon-green;
 $info: $cyan;
 $warning: $yellow;
-$danger: $red;
+$danger: $taeyeon-red;
 $danger-light: $red-light;
 $light: $gray-100;
 $dark: $gray-800;

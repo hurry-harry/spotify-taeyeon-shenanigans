@@ -21,6 +21,9 @@
         </div>
       </div>
     </div>
+    <div class="pb-0 p-1 mx-auto result-modal__score">
+      Score: {{result.score}}
+    </div>
   </div>
   <div class="modal-footer" [ngClass]="(result.isCorrect ? 'result-modal--correct' : 'result-modal--incorrect')">
     <button type="button" class="btn btn-outline-dark" (click)="close()">{{closeButtonText}}</button>

@@ -2,7 +2,7 @@ import { Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, Writabl
 import { Artist, TopArtistsByTrack, Track, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
-import { concatMap, finalize } from 'rxjs';
+import { Observable, concatMap, finalize, map, takeWhile, timer } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
@@ -30,6 +30,7 @@ export class PlayComponent implements OnInit {
   isFocused: boolean = false;
   isHardMode: boolean = false;
   isTrackPlaying: boolean = false;
+  isTimerStarted: boolean = false;
 
   topTracksMap: Map<string, Track> = new Map<string, Track>();
   topArtistsByTrackMap: Map<string, TopArtistsByTrack> = new Map<string, TopArtistsByTrack>();
@@ -49,6 +50,8 @@ export class PlayComponent implements OnInit {
   
   hoverIndex: number = -1;
 
+  timerInterval: any; // for the setInterval
+  timeLeft: number = 0.0;
   volume: number = 0.3;
 
   hasFilteredTracksSignal: WritableSignal<boolean> = signal(false);
@@ -136,6 +139,7 @@ export class PlayComponent implements OnInit {
     this.getQuizSongs();
     this.quizIndex = 0;
     this.isPlaying = true;
+    this.startTimer();
   }
 
   getQuizSongs(): void {
@@ -171,29 +175,39 @@ export class PlayComponent implements OnInit {
     this.filter = `${this.filteredTracks[index].name} - ${this.filteredTracks[index].artists[0].name}`;
   }
 
-  submitAnswer(): void {
-    this.isTrackPlaying = false;
-    const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistsToStr(this.selectedAnswer!.artists));
-    const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistsToStr(this.quizSongs[this.quizIndex]!.artists));
-
+  submitAnswer(isTimeRanOut: boolean = false): void {
     let modalRef: NgbModalRef;
+    this.isTrackPlaying = false;
+    this.isTimerStarted = false;
+    clearInterval(this.timerInterval);
 
-    if (this.quizIndex === 4) 
-      modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
-    else 
-    modalRef = this.modalService.open(QuizAnswerModal);
-
-    if (selectedAnswerStrId === quizAnswerStrId) {
-      this.quizScore++;
-      (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
-    } else {
+    if (isTimeRanOut) {
+      modalRef = this.modalService.open(QuizAnswerModal);
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
+    } else {
+      const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistsToStr(this.selectedAnswer!.artists));
+      const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistsToStr(this.quizSongs[this.quizIndex]!.artists));
+    
+      if (this.quizIndex === 4) 
+        modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+      else 
+        modalRef = this.modalService.open(QuizAnswerModal);
+  
+      if (selectedAnswerStrId === quizAnswerStrId) {
+        this.quizScore++;
+        (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
+      } else {
+        (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
+      }
     }
 
     modalRef.closed.subscribe(() => {
       this.selectedAnswer = null;
       this.filter = null;
       this.quizIndex++;
+
+      if (this.quizSongs[this.quizIndex])
+        this.startTimer();
     });
 
     modalRef.dismissed.subscribe(() => {
@@ -353,5 +367,28 @@ export class PlayComponent implements OnInit {
         }
       }
     }, 100);
+  }
+
+  startTimer(): void {
+    console.log('start timer');
+    this.timeLeft = JSON.parse(JSON.stringify(this.quizSettings.timer));
+
+    if (!this.isTimerStarted) {
+      console.log('in if');
+      setTimeout(() => {
+        console.log('timeout');
+        this.isTimerStarted = true;
+        
+        this.timerInterval = setInterval(() => {
+          console.log('interval');
+          if (this.isTimerStarted && this.timeLeft > 0.0)
+            this.timeLeft--;
+          else if (this.isTimerStarted && this.timeLeft <= 0) {
+            clearInterval(this.timerInterval);
+            this.submitAnswer(true);
+          }
+        }, 1000);
+      }, 500);
+    }
   }
 }

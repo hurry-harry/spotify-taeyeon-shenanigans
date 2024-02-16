@@ -1,24 +1,35 @@
-import { HttpClient } from "@angular/common/http";
 import { UserProfileResponse } from "../models/user-profile-response.model";
-import { Injectable, WritableSignal, signal } from "@angular/core";
+import { Injectable, OnInit, WritableSignal, effect, signal } from "@angular/core";
+import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-response.model";
+import { SpotifyService } from "./spotify.service";
 
 @Injectable({ providedIn: 'root' })
-export class UserService {
-  private authToken: string = "";
-  private user: UserProfileResponse = {} as UserProfileResponse;
+export class UserService implements OnInit {
+  private user: UserProfileResponse = { } as UserProfileResponse;
+  private spotifyTokenDetails: SpotifyAccessTokenResponse = { } as SpotifyAccessTokenResponse;
   
   userSignal: WritableSignal<UserProfileResponse> = signal(this.user);
-  authTokenSignal: WritableSignal<string> = signal(this.authToken);
+  spotifyTokenDetailsSignal: WritableSignal<SpotifyAccessTokenResponse> = signal(this.spotifyTokenDetails);
 
   constructor(
-    private http: HttpClient) { }
+    private spotifyService: SpotifyService
+  ) { }
 
-  getAuthToken(): string {
-    return this.authToken;
-  }
+  ngOnInit(): void {
 
-  setAuthToken(token: string): void {
-    this.authToken = token;
+    effect(() => {
+      console.log('userservice pre', this.spotifyTokenDetails);
+      console.log('userservice priv pre', this.spotifyTokenDetails);
+      const temp = this.spotifyTokenDetailsSignal();
+      console.log('userservice temp post', temp);
+      console.log('userservice post', this.spotifyTokenDetails);
+      console.log('userservice priv post', this.spotifyTokenDetails);
+
+      this.spotifyService.getUserProfile(this.spotifyTokenDetailsSignal().access_token).subscribe((response: UserProfileResponse) => {
+        console.log('in effect');
+        this.userSignal.set(response);
+      });
+    }, { allowSignalWrites: false });
   }
 
   getUser(): UserProfileResponse {
@@ -27,5 +38,13 @@ export class UserService {
 
   setUser(user: UserProfileResponse): void {
     this.user = user;
+  }
+
+  getSpotifyTokenDetails(): SpotifyAccessTokenResponse {
+    return this.spotifyTokenDetails;
+  }
+
+  setSpotifyTokenDetails(value: SpotifyAccessTokenResponse): void {
+    this.spotifyTokenDetails = value;
   }
 }

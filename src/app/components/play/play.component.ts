@@ -11,6 +11,7 @@ import { QuizSettings } from '../../_shared/models/quiz.model';
 import { QuizResult } from '../../_shared/models/result-modal.model';
 import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
+import { NavigationStart, Router } from '@angular/router';
 
 @Component({
   selector: 'app-play',
@@ -60,38 +61,44 @@ export class PlayComponent implements OnInit {
 
   constructor(
     private modalService: NgbModal,
+    private router: Router,
     private spotifyService: SpotifyService,
     private userService: UserService) {
+      router.events.forEach((event): void => {
+        if(event instanceof NavigationStart) {
+          clearInterval(this.timerInterval);
+        }
+      })
   }
 
   ngOnInit(): void {
     this.isLoading = true;
-    this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[0], 0, "tracks")
+    this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[0], 0, "tracks")
       .pipe(
         concatMap((response: UserTopItems) => {
           this.appendTopTracks((response as UserTopTracks).items);
           
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[0], 49, "tracks");
+          return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[0], 49, "tracks");
         }),
         concatMap((response: UserTopItems) => {
           this.appendTopTracks((response as UserTopTracks).items);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[1], 0, "tracks");
+          return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[1], 0, "tracks");
         }),
         concatMap((response: UserTopItems) => {
           this.appendTopTracks((response as UserTopTracks).items);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[1], 49, "tracks");
+          return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[1], 49, "tracks");
         }),
         concatMap((response: UserTopItems) => {
           this.appendTopTracks((response as UserTopTracks).items);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 0, "tracks");
+          return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[2], 0, "tracks");
         }),
         concatMap((response: UserTopItems) => {
           this.appendTopTracks((response as UserTopTracks).items);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRanges[2], 49, "tracks");
+          return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[2], 49, "tracks");
         }),
         finalize(() => {
           this.getTopArtistsByTrack();
@@ -370,17 +377,13 @@ export class PlayComponent implements OnInit {
   }
 
   startTimer(): void {
-    console.log('start timer');
     this.timeLeft = JSON.parse(JSON.stringify(this.quizSettings.timer));
 
     if (!this.isTimerStarted) {
-      console.log('in if');
       setTimeout(() => {
-        console.log('timeout');
         this.isTimerStarted = true;
         
         this.timerInterval = setInterval(() => {
-          console.log('interval');
           if (this.isTimerStarted && this.timeLeft > 0.0)
             this.timeLeft--;
           else if (this.isTimerStarted && this.timeLeft <= 0) {
@@ -390,5 +393,10 @@ export class PlayComponent implements OnInit {
         }, 1000);
       }, 500);
     }
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState(): void {
+    clearInterval(this.timerInterval);
   }
 }

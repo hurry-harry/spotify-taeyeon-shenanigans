@@ -18,7 +18,9 @@ export class NavBarComponent {
     private userService: UserService) {
     
     effect(() => {
+      console.log('navbar pre', this.user);
       this.user = this.userService.userSignal();
+      console.log('navbar post', this.user);
     });
   }
 

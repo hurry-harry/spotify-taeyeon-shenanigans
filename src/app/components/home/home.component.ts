@@ -17,9 +17,7 @@ export class HomeComponent implements OnInit {
   playCard: HomeCard;
   statsCard: HomeCard;
 
-  constructor(
-    private spotifyService: SpotifyService,
-    private userService: UserService) {
+  constructor() {
       this.playCard = {
         imageSource: "/assets/headphones.png",
         title: "Play Heardle",
@@ -36,8 +34,6 @@ export class HomeComponent implements OnInit {
     }
 
   ngOnInit(): void {
-    this.spotifyService.getUserProfile(this.userService.authTokenSignal()).subscribe((response: UserProfileResponse) => {
-      this.userService.userSignal.set(response);
-    });
+    
   }
 }

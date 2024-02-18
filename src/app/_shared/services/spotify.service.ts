@@ -1,9 +1,10 @@
 import { Injectable } from "@angular/core";
 import { UserProfileResponse } from "../models/user-profile-response.model";
 import { Observable } from "rxjs";
-import { HttpClient } from "@angular/common/http";
-import { SPOTIFY_MY_PROFILE, SPOTIFY_MY_TOP_ITEMS } from "../constants/spotify-url.constants";
+import { HttpClient, HttpHeaders, HttpParams, HttpParamsOptions } from "@angular/common/http";
+import { SPOTIFY_ACCESS_TOKEN, SPOTIFY_MY_PROFILE, SPOTIFY_MY_TOP_ITEMS } from "../constants/spotify-url.constants";
 import { Artist, UserTopItems } from "../models/user-top-items-response.model";
+import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-response.model";
 
 @Injectable({ providedIn: 'root' })
 export class SpotifyService {
@@ -18,6 +19,13 @@ export class SpotifyService {
         const url = `${SPOTIFY_MY_TOP_ITEMS}/${topItem}?time_range=${timeRange}&limit=50&offset=${offset}`;
 
         return this.http.get<UserTopItems>(url, { headers: { Authorization: "Bearer " + authToken } })
+    }
+
+    getAccessToken(paramsRecord: Record<string, string>): Observable<SpotifyAccessTokenResponse> {
+        const headers: HttpHeaders = new HttpHeaders().append('Content-Type', 'application/x-www-form-urlencoded');
+        const params: URLSearchParams = new URLSearchParams(paramsRecord);
+
+        return this.http.post<SpotifyAccessTokenResponse>(SPOTIFY_ACCESS_TOKEN, params, { headers: headers });
     }
     //#endregion
 

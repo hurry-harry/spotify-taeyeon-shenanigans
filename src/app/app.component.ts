@@ -1,42 +1,31 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterOutlet } from '@angular/router';
-import { UserService } from './_shared/services/user.service';
+import { RouterOutlet } from '@angular/router';
 import { NavBarComponent } from './components/nav-bar/nav-bar.component';
+import { UserProfileResponse } from './_shared/models/user-profile-response.model';
+import { SpotifyService } from './_shared/services/spotify.service';
+import { UserService } from './_shared/services/user.service';
+import { ToastContainerComponent } from './_shared/components/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavBarComponent],
+  imports: [CommonModule, RouterOutlet, NavBarComponent, ToastContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
   title: string = "spotify-taeyeon-shenanigans";
-  authToken: string = "";
-  urlRawParams: string = "";
-  urlParams: string = "";
 
   constructor(
-    private router: Router,
-    private userService: UserService) { }
+    private spotifyService: SpotifyService,
+    private userService: UserService) {
+    // effect(() => {
+    //   this.userService.spotifyTokenDetailsSignal();
 
-
-  ngOnInit(): void {
-    const url = window.location.href;
-    if (url.includes('?')) {
-      this.checkUrl(url);
-    }
-  }
-
-  checkUrl(url: string): void {
-    this.urlRawParams = url.split('?')[1];
-    this.urlParams = this.urlRawParams.split('#')[0];
-    if (this.urlParams == 'authorized=true') {
-      this.authToken = url.split('#')[1];
-      sessionStorage.setItem('authToken', this.authToken);
-      this.userService.authTokenSignal.set(this.authToken);
-      this.router.navigate(['./home']);
-    }
+    //   this.spotifyService.getUserProfile(this.userService.spotifyTokenDetailsSignal().access_token).subscribe((response: UserProfileResponse) => {
+    //     this.userService.userSignal.set(response);
+    //   });
+    // }, { allowSignalWrites: false });
   }
 }

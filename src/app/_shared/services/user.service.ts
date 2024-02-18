@@ -1,25 +1,17 @@
-import { HttpClient } from "@angular/common/http";
 import { UserProfileResponse } from "../models/user-profile-response.model";
-import { Injectable, WritableSignal, signal } from "@angular/core";
+import { Injectable, OnInit, WritableSignal, effect, signal } from "@angular/core";
+import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-response.model";
+import { SpotifyService } from "./spotify.service";
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
-  private authToken: string = "";
-  private user: UserProfileResponse = {} as UserProfileResponse;
+  private user: UserProfileResponse = { } as UserProfileResponse;
+  private spotifyTokenDetails: SpotifyAccessTokenResponse = { } as SpotifyAccessTokenResponse;
   
   userSignal: WritableSignal<UserProfileResponse> = signal(this.user);
-  authTokenSignal: WritableSignal<string> = signal(this.authToken);
+  spotifyTokenDetailsSignal: WritableSignal<SpotifyAccessTokenResponse> = signal(this.spotifyTokenDetails);
 
-  constructor(
-    private http: HttpClient) { }
-
-  getAuthToken(): string {
-    return this.authToken;
-  }
-
-  setAuthToken(token: string): void {
-    this.authToken = token;
-  }
+  constructor() { }
 
   getUser(): UserProfileResponse {
     return this.user;
@@ -27,5 +19,13 @@ export class UserService {
 
   setUser(user: UserProfileResponse): void {
     this.user = user;
+  }
+
+  getSpotifyTokenDetails(): SpotifyAccessTokenResponse {
+    return this.spotifyTokenDetails;
+  }
+
+  setSpotifyTokenDetails(value: SpotifyAccessTokenResponse): void {
+    this.spotifyTokenDetails = value;
   }
 }

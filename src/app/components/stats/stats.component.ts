@@ -48,6 +48,7 @@ export class StatsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('stats init');
     this.updateTopItems();
   }
 
@@ -70,12 +71,12 @@ export class StatsComponent implements OnInit {
     this.topArtists = [];
     this.topAlbums = [];
 
-    this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRangeMap.get(this.timeRange) || "medium_term", 0, this.topItemModeMap.get(this.topItemMode) || "tracks")
+    this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRangeMap.get(this.timeRange) || "medium_term", 0, this.topItemModeMap.get(this.topItemMode) || "tracks")
       .pipe( 
         concatMap((response: UserTopItems) => {
           this.appendTopItems(response);
 
-          return this.spotifyService.getTopItems(this.userService.authTokenSignal(), this.timeRangeMap.get(this.timeRange) || "medium_term", 49, this.topItemModeMap.get(this.topItemMode) || "tracks");
+          return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRangeMap.get(this.timeRange) || "medium_term", 49, this.topItemModeMap.get(this.topItemMode) || "tracks");
       }),
       finalize(() => {
         if (this.topItemMode === "Albums") {

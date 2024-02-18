@@ -5,6 +5,7 @@ import { UserProfileResponse } from '../../_shared/models/user-profile-response.
 import { NavBarComponent } from '../nav-bar/nav-bar.component';
 import { HomeCardComponent } from '../home-card/home-card.component';
 import { HomeCard } from '../../_shared/models/home-card.model';
+import { AuthenticationService } from '../../_shared/services/authentication.service';
 
 @Component({
   selector: 'app-home',
@@ -17,9 +18,7 @@ export class HomeComponent implements OnInit {
   playCard: HomeCard;
   statsCard: HomeCard;
 
-  constructor(
-    private spotifyService: SpotifyService,
-    private userService: UserService) {
+  constructor(private authService: AuthenticationService) {
       this.playCard = {
         imageSource: "/assets/headphones.png",
         title: "Play Heardle",
@@ -36,8 +35,20 @@ export class HomeComponent implements OnInit {
     }
 
   ngOnInit(): void {
-    this.spotifyService.getUserProfile(this.userService.authTokenSignal()).subscribe((response: UserProfileResponse) => {
-      this.userService.userSignal.set(response);
-    });
+    // const isLoggedIn = this.authService.isLoggedIn();
+    console.log('home init');
+    this.authService.isLoggedIn()
+      .subscribe({
+        next: (response: boolean) => {
+          console.log('home isloggedin next', response);
+        },
+        complete: () => {
+          console.log('home isloggedin complete');
+        },
+        error: (error) => {
+          console.log('home isloggedin error', error);
+          this.authService.authError(error);
+        }
+      });
   }
 }

@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate, CanActivateChild, CanLoad  {
   }
 
   private checkAuth(): boolean {
-    if (localStorage.getItem('authToken')) {
+    if (localStorage.getItem('access_token')) {
       return true;
     } else {
       // Redirect to the login page if the user is not authenticated

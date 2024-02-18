@@ -48,6 +48,7 @@ export class StatsComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log('stats init');
     this.updateTopItems();
   }
 

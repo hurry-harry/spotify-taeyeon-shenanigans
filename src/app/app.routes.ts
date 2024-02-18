@@ -6,6 +6,7 @@ import { StatsComponent } from './components/stats/stats.component';
 import { PlayComponent } from './components/play/play.component';
 import { AuthGuard } from './_shared/guards/auth.guard';
 import { CallbackComponent } from './components/callback/callback/callback.component';
+import { LoadingComponent } from './components/loading/loading.component';
 
 export const routes: Routes = [
     { path: "", component: LoginComponent },
@@ -14,5 +15,6 @@ export const routes: Routes = [
     { path: "authorized", component: AuthorizedComponent, canActivate: [AuthGuard] },
     { path: "stats", component: StatsComponent, canActivate: [AuthGuard] },
     { path: "play", component: PlayComponent, canActivate: [AuthGuard] },
+    { path: "loading", component: LoadingComponent },
     { path: "**", redirectTo: "home" }
 ];

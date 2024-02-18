@@ -5,11 +5,12 @@ import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 import { UserProfileResponse } from './_shared/models/user-profile-response.model';
 import { SpotifyService } from './_shared/services/spotify.service';
 import { UserService } from './_shared/services/user.service';
+import { ToastContainerComponent } from './_shared/components/toast-container/toast-container.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavBarComponent],
+  imports: [CommonModule, RouterOutlet, NavBarComponent, ToastContainerComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
@@ -19,14 +20,12 @@ export class AppComponent {
   constructor(
     private spotifyService: SpotifyService,
     private userService: UserService) {
-    effect(() => {
-      const temp = this.userService.spotifyTokenDetailsSignal();
-      console.log('userservice temp post', temp);
+    // effect(() => {
+    //   this.userService.spotifyTokenDetailsSignal();
 
-      this.spotifyService.getUserProfile(this.userService.spotifyTokenDetailsSignal().access_token).subscribe((response: UserProfileResponse) => {
-        console.log('in effect');
-        this.userService.userSignal.set(response);
-      });
-    }, { allowSignalWrites: false });
+    //   this.spotifyService.getUserProfile(this.userService.spotifyTokenDetailsSignal().access_token).subscribe((response: UserProfileResponse) => {
+    //     this.userService.userSignal.set(response);
+    //   });
+    // }, { allowSignalWrites: false });
   }
 }

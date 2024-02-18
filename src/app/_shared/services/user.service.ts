@@ -4,33 +4,14 @@ import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-respo
 import { SpotifyService } from "./spotify.service";
 
 @Injectable({ providedIn: 'root' })
-export class UserService implements OnInit {
+export class UserService {
   private user: UserProfileResponse = { } as UserProfileResponse;
   private spotifyTokenDetails: SpotifyAccessTokenResponse = { } as SpotifyAccessTokenResponse;
   
   userSignal: WritableSignal<UserProfileResponse> = signal(this.user);
   spotifyTokenDetailsSignal: WritableSignal<SpotifyAccessTokenResponse> = signal(this.spotifyTokenDetails);
 
-  constructor(
-    private spotifyService: SpotifyService
-  ) { }
-
-  ngOnInit(): void {
-
-    effect(() => {
-      console.log('userservice pre', this.spotifyTokenDetails);
-      console.log('userservice priv pre', this.spotifyTokenDetails);
-      const temp = this.spotifyTokenDetailsSignal();
-      console.log('userservice temp post', temp);
-      console.log('userservice post', this.spotifyTokenDetails);
-      console.log('userservice priv post', this.spotifyTokenDetails);
-
-      this.spotifyService.getUserProfile(this.spotifyTokenDetailsSignal().access_token).subscribe((response: UserProfileResponse) => {
-        console.log('in effect');
-        this.userSignal.set(response);
-      });
-    }, { allowSignalWrites: false });
-  }
+  constructor() { }
 
   getUser(): UserProfileResponse {
     return this.user;

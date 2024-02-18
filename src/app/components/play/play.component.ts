@@ -188,6 +188,9 @@ export class PlayComponent implements OnInit {
     this.isTimerStarted = false;
     clearInterval(this.timerInterval);
 
+    this.musicPlayer.nativeElement.pause();
+    this.musicPlayer.nativeElement.currentTime = 0;
+
     if (isTimeRanOut) {
       modalRef = this.modalService.open(QuizAnswerModal);
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};

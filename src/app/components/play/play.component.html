@@ -1,6 +1,6 @@
 <div class="play-container">
   @if (isLoading) {
-    loading...
+    <app-loading-spinner></app-loading-spinner>
   } @else {
     @if (isPlaying) {
       <ng-template *ngTemplateOutlet="playMode"></ng-template>

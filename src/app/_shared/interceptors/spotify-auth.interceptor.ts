@@ -25,10 +25,8 @@ export class SpotifyAuthInterceptor implements HttpInterceptor {
       this.authService.isLoggedIn()
         .subscribe({
           next: (response: boolean) => {
-            console.log('authInterceptor isloggedin next', response);
             if (response) {
               const url = window.location.pathname;
-              console.log('auth pathname');
               this.router.navigateByUrl('./loading', { skipLocationChange: true }).then(() => {
                 this.router.navigateByUrl(url);
               }); 
@@ -36,11 +34,8 @@ export class SpotifyAuthInterceptor implements HttpInterceptor {
             else 
               this.authService.authError(null);
           },
-          complete: () => {
-            console.log('authInterceptor isloggedin complete');
-          },
+          complete: () => { },
           error: (error) => {
-            console.log('authInterceptor isloggedin error', error);
             this.authService.authError(error);
           }
         });

@@ -38,7 +38,6 @@ export class CallbackComponent implements OnInit {
     if (code && codeVerifier && isStateValid) {
       this.authService.getAccessToken(false, code, codeVerifier)
         .subscribe((response: boolean) => {
-          console.log('callback getaccesstoken', response);
           this.router.navigate(['./home']);
         });
     } else if (error || !codeVerifier) {

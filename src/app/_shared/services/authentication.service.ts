@@ -91,8 +91,6 @@ export class AuthenticationService {
           localStorage.setItem('refresh_token', response.refresh_token);
           this.userService.spotifyTokenDetailsSignal.set(response);
 
-          console.log('concatmap');
-
           return this.spotifyService.getUserProfile(this.userService.spotifyTokenDetailsSignal().access_token);
         })
       ).subscribe({
@@ -103,7 +101,6 @@ export class AuthenticationService {
           isSuccess.next(true);
         },
         error: (error) => {
-          console.log('Spotify AccessTokenError', error);
           isSuccess.next(false);
         }
       });
@@ -141,15 +138,12 @@ export class AuthenticationService {
   }
 
   isLoggedIn(): Observable<boolean> {
-    console.log('isloggedin check');
     let isSuccess: Subject<boolean> = new Subject<boolean>();
 
     if (this.userService.userSignal().id && this.userService.spotifyTokenDetailsSignal().access_token) {
       isSuccess.next(true);
-      console.log('islogged in');
     }
     else if (localStorage.getItem('refresh_token')) {
-      console.log('refresh token');
       return this.getAccessToken(true, "", "");
     }
 
@@ -157,9 +151,6 @@ export class AuthenticationService {
   }
 
   authError(error: Error | null): void {
-    if (error)
-      console.log('Spotify AuthError', error);
-
     this.router.navigate(['']);
   }
 

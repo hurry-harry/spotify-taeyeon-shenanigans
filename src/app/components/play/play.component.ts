@@ -112,7 +112,7 @@ export class PlayComponent implements OnInit {
   appendTopTracks(topTracks: Track[]): void {
     topTracks.forEach((track: Track) => {
 
-      const trackIdentifier: string = this.spotifyService.buildTrackIdentifier(track.name, this.spotifyService.artistsToStr(track.artists));
+      const trackIdentifier: string = this.spotifyService.buildTrackIdentifier(track.name, this.spotifyService.artistNamesToString(track.artists));
       if (track.preview_url && !this.topTracksMap.has(trackIdentifier)) {
         this.topTracksMap.set(trackIdentifier, track);
       }
@@ -195,8 +195,8 @@ export class PlayComponent implements OnInit {
       modalRef = this.modalService.open(QuizAnswerModal);
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
     } else {
-      const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistsToStr(this.selectedAnswer!.artists));
-      const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistsToStr(this.quizSongs[this.quizIndex]!.artists));
+      const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistNamesToString(this.selectedAnswer!.artists));
+      const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistNamesToString(this.quizSongs[this.quizIndex]!.artists));
     
       if (this.quizIndex === 4) 
         modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
@@ -280,7 +280,8 @@ export class PlayComponent implements OnInit {
         const temp: Track[] = [];
         
         for(let j: number = 0; j < this.filteredTracks.length; j++) {
-          if (this.filteredTracks[j].name.toLowerCase().includes(filterTerms[i]) || this.spotifyService.artistsToStr(this.filteredTracks[j].artists).includes(filterTerms[i]))
+          const artistNames: string = this.spotifyService.artistNamesToString(this.filteredTracks[j].artists);
+          if (this.spotifyService.isIncludesFilter(filterTerms[i], this.filteredTracks[j].name, artistNames))
             temp.push(JSON.parse(JSON.stringify(this.filteredTracks[j])));
         }
 

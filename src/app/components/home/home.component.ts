@@ -36,17 +36,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     // const isLoggedIn = this.authService.isLoggedIn();
-    console.log('home init');
     this.authService.isLoggedIn()
       .subscribe({
-        next: (response: boolean) => {
-          console.log('home isloggedin next', response);
-        },
-        complete: () => {
-          console.log('home isloggedin complete');
-        },
+        next: (response: boolean) => { },
+        complete: () => { },
         error: (error) => {
-          console.log('home isloggedin error', error);
           this.authService.authError(error);
         }
       });

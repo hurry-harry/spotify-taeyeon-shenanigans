@@ -12,11 +12,12 @@ import { QuizResult } from '../../_shared/models/result-modal.model';
 import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NavigationStart, Router } from '@angular/router';
+import { LoadingSpinnerComponent } from '../../_shared/components/loading-spinner/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [NgSelectModule, CommonModule, FormsModule, NgbModalModule],
+  imports: [NgSelectModule, CommonModule, FormsModule, NgbModalModule, LoadingSpinnerComponent],
   templateUrl: './play.component.html',
   styleUrl: './play.component.scss'
 })

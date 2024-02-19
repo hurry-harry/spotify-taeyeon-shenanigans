@@ -6,11 +6,12 @@ import { concatMap, finalize } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SingleEpPipe } from '../../_shared/pipes/single-ep.pipe';
+import { LoadingSpinnerComponent } from '../../_shared/components/loading-spinner/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-stats',
   standalone: true,
-  imports: [ CommonModule, FormsModule, SingleEpPipe ],
+  imports: [ CommonModule, FormsModule, SingleEpPipe, LoadingSpinnerComponent ],
   templateUrl: './stats.component.html',
   styleUrl: './stats.component.scss'
 })
@@ -48,7 +49,6 @@ export class StatsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log('stats init');
     this.updateTopItems();
   }
 

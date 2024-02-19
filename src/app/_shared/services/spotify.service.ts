@@ -30,18 +30,29 @@ export class SpotifyService {
     //#endregion
 
     //#region Helpers
-    artistsToStr(artists: Artist[]): string {
+    artistNamesToString(artists: Artist[]): string {
         let result: string = "";
     
         artists.forEach((artist: Artist) => {
           result = result.concat(artist.name, " ");
         });
     
-        return result.toLowerCase();
+        return result.toLocaleLowerCase();
     }
 
     buildTrackIdentifier(trackName: string, artistsStr: string): string {
-        return trackName.concat(artistsStr).toLowerCase();
+        return trackName.concat(artistsStr).toLocaleLowerCase();
+    }
+
+    isIncludesFilter(filterTerm: string, trackName: string, artistNames: string): boolean {
+        const sanitizedTrackName: string = trackName.toLocaleLowerCase().normalizeString();
+        const sanitizedArtistNames: string = artistNames.toLocaleLowerCase().normalizeString();
+        const sanitizedFilterTerm: string = filterTerm.toLocaleLowerCase().normalizeString();
+
+        if (sanitizedTrackName.includes(sanitizedFilterTerm) || sanitizedArtistNames.includes(sanitizedFilterTerm))
+            return true;
+
+        return false;
     }
     //#endregion
 }

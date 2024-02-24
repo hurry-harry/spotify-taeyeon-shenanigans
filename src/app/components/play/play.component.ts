@@ -14,11 +14,13 @@ import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstra
 import { NavigationStart, Router } from '@angular/router';
 import { LoadingSpinnerComponent } from '../../_shared/components/loading-spinner/loading-spinner/loading-spinner.component';
 import { TracksService } from '../../_shared/services/tracks.service';
+import { HeardleQuiz } from '../../_shared/models/heardle-quiz.model';
+import { HeardleQuizComponent } from '../../_shared/components/heardle-quiz/heardle-quiz.component';
 
 @Component({
   selector: 'app-play',
   standalone: true,
-  imports: [NgSelectModule, CommonModule, FormsModule, NgbModalModule, LoadingSpinnerComponent],
+  imports: [NgSelectModule, CommonModule, FormsModule, NgbModalModule, LoadingSpinnerComponent, HeardleQuizComponent],
   templateUrl: './play.component.html',
   styleUrl: './play.component.scss'
 })
@@ -43,9 +45,11 @@ export class PlayComponent implements OnInit {
 
   quizSettings: QuizSettings = { trackDuration: NORMAL_DURATION, timer: NORMAL_TIMER, isDailyHeardle: false };
   quizSelection: Track[] = [];
-  quizSongs: Track[] = [];
+  quizTracks: Track[] = [];
   quizIndex: number = 0;
   quizScore: number = 0;
+
+  heardleQuiz!: HeardleQuiz;
 
   filteredTracks: Track[] = [];
   filter: string | null = null;
@@ -162,7 +166,7 @@ export class PlayComponent implements OnInit {
       this.quizSelection = [...this.topTracksMap.values()];
     }
 
-    this.quizSongs = this.getRandomSongs(this.quizSelection, NUMBER_OF_SONGS);
+    this.quizTracks = this.getRandomSongs(this.quizSelection, NUMBER_OF_SONGS);
   }
 
   getRandomSongs(tracks: Track[], size: number): Track[] {
@@ -409,6 +413,22 @@ export class PlayComponent implements OnInit {
   // }
 
   buildHeardleQuiz(): void {
-    
+    let timer: number = NORMAL_TIMER;
+    let duration: number = NORMAL_DURATION;
+
+    if (this.isHardMode) {
+      timer = HARD_MODE_TIMER;
+      duration = HARD_MODE_DURATION;
+    }
+
+    this.heardleQuiz = {
+      quizIndex: 0,
+      quizScore: 0,
+      quizSelection: this.quizSelection,
+      quizTracks: this.quizTracks,
+      quizSettings: { isDailyHeardle: false, timer: timer, trackDuration: duration },
+      dailyHeardleState: null,
+      utcDate: null
+    };
   }
 }

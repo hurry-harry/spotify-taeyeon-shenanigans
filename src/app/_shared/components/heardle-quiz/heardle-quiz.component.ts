@@ -80,7 +80,7 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
     let modalRef: NgbModalRef;
     this.isTrackPlaying = false;
     this.isTimerStarted = false;
-    clearInterval(this.timerInterval);
+    clearInterval(this.timerInterval);  
 
     this.musicPlayer.nativeElement.pause();
     this.musicPlayer.nativeElement.currentTime = 0;
@@ -94,7 +94,8 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: this.heardleQuiz.quizIndex === 4 || this.heardleQuiz.quizSettings.isDailyHeardle,
         score: this.heardleQuiz.quizScore, track: this.heardleQuiz.quizTracks[this.heardleQuiz.quizIndex]!};
 
-      this.updateDailyHeardleState(false);
+      if (this.heardleQuiz.quizSettings.isDailyHeardle)
+        this.updateDailyHeardleState(false);
     } else {
       const selectedAnswerStrId: string = this.tracksService.buildTrackIdentifier(this.selectedAnswer!.name,
         this.tracksService.artistNamesToString(this.selectedAnswer!.artists));
@@ -106,12 +107,14 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
         (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: this.heardleQuiz.quizIndex === 4 || this.heardleQuiz.quizSettings.isDailyHeardle,
           score: this.heardleQuiz.quizScore, track: this.heardleQuiz.quizTracks[this.heardleQuiz.quizIndex]!};
         
-        this.updateDailyHeardleState(true);
+        if (this.heardleQuiz.quizSettings.isDailyHeardle)
+          this.updateDailyHeardleState(true);
       } else {
         (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: this.heardleQuiz.quizIndex === 4 || this.heardleQuiz.quizSettings.isDailyHeardle,
           score: this.heardleQuiz.quizScore, track: this.heardleQuiz.quizTracks[this.heardleQuiz.quizIndex]!};
         
-        this.updateDailyHeardleState(false);
+        if (this.heardleQuiz.quizSettings.isDailyHeardle)
+          this.updateDailyHeardleState(false);
       }
     }
 

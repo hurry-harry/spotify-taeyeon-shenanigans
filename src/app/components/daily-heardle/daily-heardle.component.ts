@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
 import { firstValueFrom } from 'rxjs';
@@ -78,7 +78,7 @@ export class DailyHeardleComponent implements OnInit {
       this.tracksMap = this.tracksService.appendTracksMap(this.tracksMap, page.tracks.items, "TAEYEON");
       isFinished = !(this.hasMoreResultPages(page.tracks.next));
       offset += 50;
-    };
+    }
   }
 
   hasMoreResultPages(next: string): boolean {
@@ -151,8 +151,7 @@ export class DailyHeardleComponent implements OnInit {
   displayResultModal(): void {
     const isCorrect: boolean = this.state.winStreak > 0;
     
-    let modalRef: NgbModalRef;
-    modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+    const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
 
     if (isCorrect) {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: true,

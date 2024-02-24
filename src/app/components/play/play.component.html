@@ -3,7 +3,8 @@
     <app-loading-spinner></app-loading-spinner>
   } @else {
     @if (isPlaying) {
-      <ng-template *ngTemplateOutlet="playMode"></ng-template>
+      <app-heardle-quiz [heardleQuiz]="heardleQuiz"></app-heardle-quiz>
+      <!-- <ng-template *ngTemplateOutlet="playMode"></ng-template> -->
     } @else {
       <ng-template *ngTemplateOutlet="playSettings"></ng-template>
     }
@@ -52,7 +53,7 @@
   </div>
 </ng-template>
 
-<ng-template #playMode>
+<!-- <ng-template #playMode>
   <div class="play-container__row">
     <div class="play-container__row__left-section">
       <span>#</span>
@@ -100,4 +101,4 @@
     </div>
     <button [disabled]="!selectedAnswer" class="btn btn-primary btn__submit" (click)="submitAnswer()">Submit</button>
   </div>
-</ng-template>
+</ng-template> -->

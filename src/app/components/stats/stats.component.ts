@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
-import { Album, Artist, Item, TopAlbumItem, Track, UserTopArtists, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
+import { Album, Artist, Item, TopAlbumItem, Track, ArtistsResponse, TracksResponse, SpotifyBaseResponse } from '../../_shared/models/spotify.model';
 import { concatMap, finalize } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -17,7 +17,7 @@ import { LoadingSpinnerComponent } from '../../_shared/components/loading-spinne
 })
 export class StatsComponent implements OnInit {
   isLoading: boolean = true;
-  userTopItems!: UserTopItems;
+  userTopItems!: SpotifyBaseResponse;
   topTracks: Track[] = [];
   topArtists: Artist[] = [];
   topAlbums: TopAlbumItem[] = [];
@@ -52,11 +52,11 @@ export class StatsComponent implements OnInit {
     this.updateTopItems();
   }
 
-  appendTopItems(response: UserTopItems): void {
+  appendTopItems(response: SpotifyBaseResponse): void {
     if (this.topItemMode == this.topItemModeSelection[0]) {
-      this.topArtists.push(...(response as UserTopArtists).items);
+      this.topArtists.push(...(response as ArtistsResponse).items);
     } else {
-      this.topTracks.push(...(response as UserTopTracks).items);
+      this.topTracks.push(...(response as TracksResponse).items);
     }
   }
 
@@ -73,7 +73,7 @@ export class StatsComponent implements OnInit {
 
     this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRangeMap.get(this.timeRange) || "medium_term", 0, this.topItemModeMap.get(this.topItemMode) || "tracks")
       .pipe( 
-        concatMap((response: UserTopItems) => {
+        concatMap((response: SpotifyBaseResponse) => {
           this.appendTopItems(response);
 
           return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRangeMap.get(this.timeRange) || "medium_term", 49, this.topItemModeMap.get(this.topItemMode) || "tracks");
@@ -85,7 +85,7 @@ export class StatsComponent implements OnInit {
 
         this.isLoading = false;
       })
-    ).subscribe((response: UserTopItems) => {
+    ).subscribe((response: SpotifyBaseResponse) => {
       this.appendTopItems(response);
     });
   }

@@ -1,5 +1,5 @@
 import { Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, WritableSignal, signal } from '@angular/core';
-import { Artist, TopArtistsByTrack, Track, UserTopItems, UserTopTracks } from '../../_shared/models/user-top-items-response.model';
+import { Artist, SpotifyBaseResponse, TopArtistsByTrack, Track, TracksResponse } from '../../_shared/models/spotify.model';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
 import { Observable, concatMap, finalize, map, takeWhile, timer } from 'rxjs';
@@ -13,6 +13,7 @@ import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/qui
 import { NgbModal, NgbModalModule, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { NavigationStart, Router } from '@angular/router';
 import { LoadingSpinnerComponent } from '../../_shared/components/loading-spinner/loading-spinner/loading-spinner.component';
+import { TracksService } from '../../_shared/services/tracks.service';
 
 @Component({
   selector: 'app-play',
@@ -40,7 +41,7 @@ export class PlayComponent implements OnInit {
   specificArtist!: Artist;
   specificArtistSelection: Artist[] = [];
 
-  quizSettings: QuizSettings = { trackDuration: NORMAL_DURATION, timer: NORMAL_TIMER };
+  quizSettings: QuizSettings = { trackDuration: NORMAL_DURATION, timer: NORMAL_TIMER, isDailyHeardle: false };
   quizSelection: Track[] = [];
   quizSongs: Track[] = [];
   quizIndex: number = 0;
@@ -64,8 +65,9 @@ export class PlayComponent implements OnInit {
     private modalService: NgbModal,
     private router: Router,
     private spotifyService: SpotifyService,
+    private tracksService: TracksService,
     private userService: UserService) {
-      router.events.forEach((event): void => {
+      this.router.events.forEach((event): void => {
         if(event instanceof NavigationStart) {
           clearInterval(this.timerInterval);
         }
@@ -76,28 +78,28 @@ export class PlayComponent implements OnInit {
     this.isLoading = true;
     this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[0], 0, "tracks")
       .pipe(
-        concatMap((response: UserTopItems) => {
-          this.appendTopTracks((response as UserTopTracks).items);
+        concatMap((response: SpotifyBaseResponse) => {
+          this.appendTopTracks((response as TracksResponse).items);
           
           return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[0], 49, "tracks");
         }),
-        concatMap((response: UserTopItems) => {
-          this.appendTopTracks((response as UserTopTracks).items);
+        concatMap((response: SpotifyBaseResponse) => {
+          this.appendTopTracks((response as TracksResponse).items);
 
           return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[1], 0, "tracks");
         }),
-        concatMap((response: UserTopItems) => {
-          this.appendTopTracks((response as UserTopTracks).items);
+        concatMap((response: SpotifyBaseResponse) => {
+          this.appendTopTracks((response as TracksResponse).items);
 
           return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[1], 49, "tracks");
         }),
-        concatMap((response: UserTopItems) => {
-          this.appendTopTracks((response as UserTopTracks).items);
+        concatMap((response: SpotifyBaseResponse) => {
+          this.appendTopTracks((response as TracksResponse).items);
 
           return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[2], 0, "tracks");
         }),
-        concatMap((response: UserTopItems) => {
-          this.appendTopTracks((response as UserTopTracks).items);
+        concatMap((response: SpotifyBaseResponse) => {
+          this.appendTopTracks((response as TracksResponse).items);
 
           return this.spotifyService.getTopItems(this.userService.spotifyTokenDetailsSignal().access_token, this.timeRanges[2], 49, "tracks");
         }),
@@ -105,15 +107,15 @@ export class PlayComponent implements OnInit {
           this.getTopArtistsByTrack();
           this.isLoading = false;
         })
-      ). subscribe((response: UserTopItems) => {
-        this.appendTopTracks((response as UserTopTracks).items);
+      ). subscribe((response: SpotifyBaseResponse) => {
+        this.appendTopTracks((response as TracksResponse).items);
       });
   }
 
   appendTopTracks(topTracks: Track[]): void {
     topTracks.forEach((track: Track) => {
 
-      const trackIdentifier: string = this.spotifyService.buildTrackIdentifier(track.name, this.spotifyService.artistNamesToString(track.artists));
+      const trackIdentifier: string = this.tracksService.buildTrackIdentifier(track.name, this.tracksService.artistNamesToString(track.artists));
       if (track.preview_url && !this.topTracksMap.has(trackIdentifier)) {
         this.topTracksMap.set(trackIdentifier, track);
       }
@@ -142,12 +144,13 @@ export class PlayComponent implements OnInit {
 
   play(): void {
     if (this.isHardMode)
-      this.quizSettings = { trackDuration: HARD_MODE_DURATION, timer: HARD_MODE_TIMER };
+      this.quizSettings = { trackDuration: HARD_MODE_DURATION, timer: HARD_MODE_TIMER, isDailyHeardle: false };
 
     this.getQuizSongs();
     this.quizIndex = 0;
+    this.buildHeardleQuiz();
     this.isPlaying = true;
-    this.startTimer();
+    //this.startTimer();
   }
 
   getQuizSongs(): void {
@@ -176,232 +179,236 @@ export class PlayComponent implements OnInit {
     return result;
   }
 
-  selectAnswer(index: number): void {
-    this.isFocused = false;
-    this.isFocusedSignal.set(this.isFocused);
-    this.selectedAnswer = this.filteredTracks[index];
-    this.filter = `${this.filteredTracks[index].name} - ${this.filteredTracks[index].artists[0].name}`;
-  }
+  // selectAnswer(index: number): void {
+  //   this.isFocused = false;
+  //   this.isFocusedSignal.set(this.isFocused);
+  //   this.selectedAnswer = this.filteredTracks[index];
+  //   this.filter = `${this.filteredTracks[index].name} - ${this.filteredTracks[index].artists[0].name}`;
+  // }
 
-  submitAnswer(isTimeRanOut: boolean = false): void {
-    let modalRef: NgbModalRef;
-    this.isTrackPlaying = false;
-    this.isTimerStarted = false;
-    clearInterval(this.timerInterval);
+  // submitAnswer(isTimeRanOut: boolean = false): void {
+  //   let modalRef: NgbModalRef;
+  //   this.isTrackPlaying = false;
+  //   this.isTimerStarted = false;
+  //   clearInterval(this.timerInterval);
 
-    this.musicPlayer.nativeElement.pause();
-    this.musicPlayer.nativeElement.currentTime = 0;
+  //   this.musicPlayer.nativeElement.pause();
+  //   this.musicPlayer.nativeElement.currentTime = 0;
 
-    if (isTimeRanOut) {
-      modalRef = this.modalService.open(QuizAnswerModal);
-      (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
-    } else {
-      const selectedAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.selectedAnswer!.name, this.spotifyService.artistNamesToString(this.selectedAnswer!.artists));
-      const quizAnswerStrId: string = this.spotifyService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.spotifyService.artistNamesToString(this.quizSongs[this.quizIndex]!.artists));
+  //   if (isTimeRanOut) {
+  //     modalRef = this.modalService.open(QuizAnswerModal);
+  //     (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
+  //   } else {
+  //     const selectedAnswerStrId: string = this.tracksService.buildTrackIdentifier(this.selectedAnswer!.name, this.tracksService.artistNamesToString(this.selectedAnswer!.artists));
+  //     const quizAnswerStrId: string = this.tracksService.buildTrackIdentifier(this.quizSongs[this.quizIndex]!.name, this.tracksService.artistNamesToString(this.quizSongs[this.quizIndex]!.artists));
     
-      if (this.quizIndex === 4) 
-        modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
-      else 
-        modalRef = this.modalService.open(QuizAnswerModal);
+  //     if (this.quizIndex === 4) 
+  //       modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+  //     else 
+  //       modalRef = this.modalService.open(QuizAnswerModal);
   
-      if (selectedAnswerStrId === quizAnswerStrId) {
-        this.quizScore++;
-        (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
-      } else {
-        (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
-      }
-    }
+  //     if (selectedAnswerStrId === quizAnswerStrId) {
+  //       this.quizScore++;
+  //       (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
+  //     } else {
+  //       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: (this.quizIndex === 4), score: this.quizScore, track: this.quizSongs[this.quizIndex]!};
+  //     }
+  //   }
 
-    modalRef.closed.subscribe(() => {
-      this.selectedAnswer = null;
-      this.filter = null;
-      this.quizIndex++;
+  //   modalRef.closed.subscribe(() => {
+  //     this.selectedAnswer = null;
+  //     this.filter = null;
+  //     this.quizIndex++;
 
-      if (this.quizSongs[this.quizIndex])
-        this.startTimer();
-    });
+  //     if (this.quizSongs[this.quizIndex])
+  //       this.startTimer();
+  //   });
 
-    modalRef.dismissed.subscribe(() => {
-      modalRef.close();
-    })
-  }
+  //   modalRef.dismissed.subscribe(() => {
+  //     modalRef.close();
+  //   })
+  // }
 
-  handleKeyUp(event: Event): void {
-    const key: KeyboardEvent = event as KeyboardEvent;
+  // handleKeyUp(event: Event): void {
+  //   const key: KeyboardEvent = event as KeyboardEvent;
 
-    if (this.filter!.length > 0 && this.selectedAnswer) {
-      this.submitAnswer();
-    } else {
-      switch (key.key) {
-        case "ArrowUp": 
-          if (this.hoverIndex != 0) {
-            this.hoverIndex--;
-            this.scrollTo();
-          }
-          break;
-        case "ArrowDown":
-          if (this.hoverIndex < this.filteredTracks.length - 1) {
-            this.hoverIndex++;
-            this.scrollTo();
-          }
-          break;
-        case "Enter":
-          if (this.hoverIndex >= 0) {
-            this.selectAnswer(this.hoverIndex);
-          }
-          break;
-        default:
-          this.selectedAnswer = null;
-          this.filterTracks();
-          break;
-      }
-    }
-  }
+  //   if (this.filter!.length > 0 && this.selectedAnswer) {
+  //     this.submitAnswer();
+  //   } else {
+  //     switch (key.key) {
+  //       case "ArrowUp": 
+  //         if (this.hoverIndex != 0) {
+  //           this.hoverIndex--;
+  //           this.scrollTo();
+  //         }
+  //         break;
+  //       case "ArrowDown":
+  //         if (this.hoverIndex < this.filteredTracks.length - 1) {
+  //           this.hoverIndex++;
+  //           this.scrollTo();
+  //         }
+  //         break;
+  //       case "Enter":
+  //         if (this.hoverIndex >= 0) {
+  //           this.selectAnswer(this.hoverIndex);
+  //         }
+  //         break;
+  //       default:
+  //         this.selectedAnswer = null;
+  //         this.filterTracks();
+  //         break;
+  //     }
+  //   }
+  // }
 
-  scrollTo() {
-    if (this.hoverIndex != -1) {
-      const scrollTo = document.getElementById('track-' + this.hoverIndex);
-      if (scrollTo) {
-        scrollTo.scrollIntoView(true);
-      }
-    }
-  }
+  // scrollTo() {
+  //   if (this.hoverIndex != -1) {
+  //     const scrollTo = document.getElementById('track-' + this.hoverIndex);
+  //     if (scrollTo) {
+  //       scrollTo.scrollIntoView(true);
+  //     }
+  //   }
+  // }
 
-  filterTracks(): void {
-    const filterTerms: string[] = this.filter!.split(' ');
+  // filterTracks(): void {
+  //   const filterTerms: string[] = this.filter!.split(' ');
 
-    if (this.filter === "" || this.filter === null) {
-      this.filteredTracks = [];
-    } else {
-      this.isFocused = true;
-      this.isFocusedSignal.set(this.isFocused);
+  //   if (this.filter === "" || this.filter === null) {
+  //     this.filteredTracks = [];
+  //   } else {
+  //     this.isFocused = true;
+  //     this.isFocusedSignal.set(this.isFocused);
 
-      this.filteredTracks = this.quizSelection;
-      for(let i: number = 0; i < filterTerms.length; i++) {
-        const temp: Track[] = [];
+  //     this.filteredTracks = this.quizSelection;
+  //     for(let i: number = 0; i < filterTerms.length; i++) {
+  //       const temp: Track[] = [];
         
-        for(let j: number = 0; j < this.filteredTracks.length; j++) {
-          const artistNames: string = this.spotifyService.artistNamesToString(this.filteredTracks[j].artists);
-          if (this.spotifyService.isIncludesFilter(filterTerms[i], this.filteredTracks[j].name, artistNames))
-            temp.push(JSON.parse(JSON.stringify(this.filteredTracks[j])));
-        }
+  //       for(let j: number = 0; j < this.filteredTracks.length; j++) {
+  //         const artistNames: string = this.tracksService.artistNamesToString(this.filteredTracks[j].artists);
+  //         if (this.tracksService.isIncludesFilter(filterTerms[i], this.filteredTracks[j].name, artistNames))
+  //           temp.push(JSON.parse(JSON.stringify(this.filteredTracks[j])));
+  //       }
 
-        this.filteredTracks = temp;
-      }
-    }
-  }
+  //       this.filteredTracks = temp;
+  //     }
+  //   }
+  // }
 
-  compareArtistsOnTrack(artists: Artist[], term: string): boolean {
-    let allArtists: string = "";
+  // compareArtistsOnTrack(artists: Artist[], term: string): boolean {
+  //   let allArtists: string = "";
 
-    artists.forEach((artist: Artist) => {
-      allArtists = allArtists.concat(artist.name, " ");
-    });
+  //   artists.forEach((artist: Artist) => {
+  //     allArtists = allArtists.concat(artist.name, " ");
+  //   });
 
-    if (allArtists.includes(term))
-      return true;
+  //   if (allArtists.includes(term))
+  //     return true;
 
-    return false
-  }
+  //   return false
+  // }
 
-  toggleFocused(): void {
-    this.isFocused = !this.isFocused;
-    this.isFocusedSignal.set(this.isFocused);
-  }
+  // toggleFocused(): void {
+  //   this.isFocused = !this.isFocused;
+  //   this.isFocusedSignal.set(this.isFocused);
+  // }
 
-  @HostListener('document:click', ['$event.target'])
-  documentClick(targetElement: any): void {
-    const isInside: boolean = this.autocompleteContainer?.nativeElement.contains(targetElement);
+  // @HostListener('document:click', ['$event.target'])
+  // documentClick(targetElement: any): void {
+  //   const isInside: boolean = this.autocompleteContainer?.nativeElement.contains(targetElement);
 
-    if (!isInside) {
-      this.isFocused = false;
-      this.isFocusedSignal.set(this.isFocused);
-      this.hoverIndex = -1;
-    }
-  }
+  //   if (!isInside) {
+  //     this.isFocused = false;
+  //     this.isFocusedSignal.set(this.isFocused);
+  //     this.hoverIndex = -1;
+  //   }
+  // }
 
-  toggleAudio(): void {
-    this.isTrackPlaying = !this.isTrackPlaying;
-    this.musicPlayer.nativeElement.load();
+  // toggleAudio(): void {
+  //   this.isTrackPlaying = !this.isTrackPlaying;
+  //   this.musicPlayer.nativeElement.load();
 
-    const isReadyToPlay: boolean = !(this.musicPlayer.nativeElement.currentTime > 0 && !this.musicPlayer.nativeElement.paused
-      && !this.musicPlayer.nativeElement.ended && this.musicPlayer.nativeElement.readyState > this.musicPlayer.nativeElement.HAVE_CURRENT_DATA);
+  //   const isReadyToPlay: boolean = !(this.musicPlayer.nativeElement.currentTime > 0 && !this.musicPlayer.nativeElement.paused
+  //     && !this.musicPlayer.nativeElement.ended && this.musicPlayer.nativeElement.readyState > this.musicPlayer.nativeElement.HAVE_CURRENT_DATA);
 
-    if (this.isTrackPlaying && isReadyToPlay) {
-      this.musicPlayer.nativeElement.play();
-      this.audioFadeIn();
-      this.audioFadeOut();
-    } else if (!this.isTrackPlaying) {
-      this.audioFadeOut(true);
-    }
-  }
+  //   if (this.isTrackPlaying && isReadyToPlay) {
+  //     this.musicPlayer.nativeElement.play();
+  //     this.audioFadeIn();
+  //     this.audioFadeOut();
+  //   } else if (!this.isTrackPlaying) {
+  //     this.audioFadeOut(true);
+  //   }
+  // }
 
-  audioFadeIn(): void {
-    this.musicPlayer.nativeElement.volume = 0;
+  // audioFadeIn(): void {
+  //   this.musicPlayer.nativeElement.volume = 0;
 
-    const fadeIn = setInterval(() => {
-      if (this.musicPlayer.nativeElement.currentTime >= 0.0 && this.musicPlayer.nativeElement.volume < this.volume) {
-        try {
-          this.musicPlayer.nativeElement.volume += VOLUME_INCREMENTER;
-        } catch {
-          clearInterval(fadeIn);
-        }
-      } else if (this.musicPlayer.nativeElement.volume >= this.volume) {
-        clearInterval(fadeIn);
-      }
-    }, 100);
-  }
+  //   const fadeIn = setInterval(() => {
+  //     if (this.musicPlayer.nativeElement.currentTime >= 0.0 && this.musicPlayer.nativeElement.volume < this.volume) {
+  //       try {
+  //         this.musicPlayer.nativeElement.volume += VOLUME_INCREMENTER;
+  //       } catch {
+  //         clearInterval(fadeIn);
+  //       }
+  //     } else if (this.musicPlayer.nativeElement.volume >= this.volume) {
+  //       clearInterval(fadeIn);
+  //     }
+  //   }, 100);
+  // }
 
-  audioFadeOut(fromPause: boolean = false): void {
-    const fadeOut = setInterval(() => {
-      if (fromPause) {
-        if (this.musicPlayer.nativeElement.volume > 0.0) {
-          try {
-            this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
-          } catch {
-            clearInterval(fadeOut);
-            this.musicPlayer.nativeElement.pause();
-            this.musicPlayer.nativeElement.currentTime = 0;
-          }
-        } else if (this.musicPlayer.nativeElement.volume <= 0.0) {
-          clearInterval(fadeOut);
-        }
-      } else {
-        if (this.musicPlayer.nativeElement.currentTime >= this.quizSettings.trackDuration && this.musicPlayer.nativeElement.volume > 0) {
-          try {
-            this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
-          } catch {
-            clearInterval(fadeOut);
-            this.isTrackPlaying = false;
-            this.musicPlayer.nativeElement.pause();
-            this.musicPlayer.nativeElement.currentTime = 0;
-          }
-        }
-      }
-    }, 100);
-  }
+  // audioFadeOut(fromPause: boolean = false): void {
+  //   const fadeOut = setInterval(() => {
+  //     if (fromPause) {
+  //       if (this.musicPlayer.nativeElement.volume > 0.0) {
+  //         try {
+  //           this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
+  //         } catch {
+  //           clearInterval(fadeOut);
+  //           this.musicPlayer.nativeElement.pause();
+  //           this.musicPlayer.nativeElement.currentTime = 0;
+  //         }
+  //       } else if (this.musicPlayer.nativeElement.volume <= 0.0) {
+  //         clearInterval(fadeOut);
+  //       }
+  //     } else {
+  //       if (this.musicPlayer.nativeElement.currentTime >= this.quizSettings.trackDuration && this.musicPlayer.nativeElement.volume > 0) {
+  //         try {
+  //           this.musicPlayer.nativeElement.volume -= VOLUME_DECREMENTER;
+  //         } catch {
+  //           clearInterval(fadeOut);
+  //           this.isTrackPlaying = false;
+  //           this.musicPlayer.nativeElement.pause();
+  //           this.musicPlayer.nativeElement.currentTime = 0;
+  //         }
+  //       }
+  //     }
+  //   }, 100);
+  // }
 
-  startTimer(): void {
-    this.timeLeft = JSON.parse(JSON.stringify(this.quizSettings.timer));
+  // startTimer(): void {
+  //   this.timeLeft = JSON.parse(JSON.stringify(this.quizSettings.timer));
 
-    if (!this.isTimerStarted) {
-      setTimeout(() => {
-        this.isTimerStarted = true;
+  //   if (!this.isTimerStarted) {
+  //     setTimeout(() => {
+  //       this.isTimerStarted = true;
         
-        this.timerInterval = setInterval(() => {
-          if (this.isTimerStarted && this.timeLeft > 0.0)
-            this.timeLeft--;
-          else if (this.isTimerStarted && this.timeLeft <= 0) {
-            clearInterval(this.timerInterval);
-            this.submitAnswer(true);
-          }
-        }, 1000);
-      }, 500);
-    }
-  }
+  //       this.timerInterval = setInterval(() => {
+  //         if (this.isTimerStarted && this.timeLeft > 0.0)
+  //           this.timeLeft--;
+  //         else if (this.isTimerStarted && this.timeLeft <= 0) {
+  //           clearInterval(this.timerInterval);
+  //           this.submitAnswer(true);
+  //         }
+  //       }, 1000);
+  //     }, 500);
+  //   }
+  // }
 
-  @HostListener('window:popstate', ['$event'])
-  onPopState(): void {
-    clearInterval(this.timerInterval);
+  // @HostListener('window:popstate', ['$event'])
+  // onPopState(): void {
+  //   clearInterval(this.timerInterval);
+  // }
+
+  buildHeardleQuiz(): void {
+    
   }
 }

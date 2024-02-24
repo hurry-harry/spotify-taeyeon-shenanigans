@@ -1,4 +1,4 @@
-import { ExternalUrls, Followers, Image } from "./spotify-shared.model";
+import { ExternalUrls, Followers, Image } from "./spotify.model";
 
 export interface UserProfileResponse {
     country: string;

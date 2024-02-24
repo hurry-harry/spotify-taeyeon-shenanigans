@@ -1,20 +1,33 @@
-import { ExternalUrls, Followers, Image } from "./spotify-shared.model";
-
-export interface UserTopItems {
+export interface SpotifyBaseResponse {
   href: string;
   limit: number;
   offset: number;
   total: number;
   next: string;
   previous: string;
-}
+};
 
-export interface UserTopTracks extends UserTopItems {
+export interface TracksResponse extends SpotifyBaseResponse {
   items: Track[];
 }
 
-export interface UserTopArtists extends UserTopItems {
+export interface ArtistsResponse extends SpotifyBaseResponse {
   items: Artist[];
+}
+
+export interface ExternalUrls {
+  spotify: string;
+}
+
+export interface Followers {
+  href: string; // will always be null, Spotify Web API currently does not support it
+  total: number;
+}
+
+export interface Image {
+  url: string;
+  height: number; // in pixels
+  width: number; // in pixels
 }
 
 export interface Item {

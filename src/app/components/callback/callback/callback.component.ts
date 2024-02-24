@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { SPOTIFY_CLIENT_ID, SPOTIFY_REDIRECT_URI } from '../../../_shared/constants/spotify-auth.constants';
-import { SPOTIFY_ACCESS_TOKEN } from '../../../_shared/constants/spotify-url.constants';
 import { SpotifyService } from '../../../_shared/services/spotify.service';
 import { SpotifyAccessTokenResponse } from '../../../_shared/models/spotify-access-token-response.model';
 import { UserService } from '../../../_shared/services/user.service';
@@ -9,11 +8,12 @@ import { ToastService } from '../../../_shared/services/toast.service';
 import { concatMap } from 'rxjs';
 import { UserProfileResponse } from '../../../_shared/models/user-profile-response.model';
 import { AuthenticationService } from '../../../_shared/services/authentication.service';
+import { LoadingSpinnerComponent } from '../../../_shared/components/loading-spinner/loading-spinner/loading-spinner.component';
 
 @Component({
   selector: 'app-callback',
   standalone: true,
-  imports: [],
+  imports: [LoadingSpinnerComponent],
   templateUrl: './callback.component.html',
   styleUrl: './callback.component.scss'
 })

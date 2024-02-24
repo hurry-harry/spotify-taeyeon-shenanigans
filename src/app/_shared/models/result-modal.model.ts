@@ -1,4 +1,4 @@
-import { Track } from "./user-top-items-response.model";
+import { Track } from "./spotify.model";
 
 export interface QuizResult {
   isCorrect: boolean;

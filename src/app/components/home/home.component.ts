@@ -17,6 +17,7 @@ import { AuthenticationService } from '../../_shared/services/authentication.ser
 export class HomeComponent implements OnInit {
   playCard: HomeCard;
   statsCard: HomeCard;
+  dailyCard: HomeCard;
 
   constructor(private authService: AuthenticationService) {
       this.playCard = {
@@ -32,6 +33,13 @@ export class HomeComponent implements OnInit {
         description: "Take a look at your most played songs or artists!",
         url: "stats"
       };
+
+      this.dailyCard = {
+        imageSource: "/assets/clock.png",
+        title: "Daily Heardle",
+        description: "Play the daily Taeyeon Heardle!",
+        url: "daily"
+      }
     }
 
   ngOnInit(): void {

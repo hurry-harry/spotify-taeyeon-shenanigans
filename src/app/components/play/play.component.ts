@@ -193,8 +193,9 @@ export class PlayComponent implements OnInit {
       quizSelection: this.quizSelection,
       quizTracks: this.quizTracks,
       quizSettings: { isDailyHeardle: false, timer: timer, trackDuration: duration },
+      utcDate: null,
       dailyHeardleState: null,
-      utcDate: null
+      dailyHeardleDayCount: null
     };
   }
 }

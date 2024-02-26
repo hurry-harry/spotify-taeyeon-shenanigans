@@ -10,4 +10,5 @@ export interface HeardleQuiz {
   quizScore: number;
   utcDate: Date | null;
   dailyHeardleState: DailyHeardleState | null;
+  dailyHeardleDayCount: number | null;
 }

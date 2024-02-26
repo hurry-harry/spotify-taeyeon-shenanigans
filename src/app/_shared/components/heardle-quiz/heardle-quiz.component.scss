@@ -37,6 +37,15 @@
       margin: 20px 0px 40px;
     }
   }
+
+  @media (max-width: 768px) {
+    
+    &__row {
+      &__right-section {
+        padding: 0px
+      }
+    }
+  }
 }
 
 .audio {
@@ -78,6 +87,12 @@
       border-radius: 12px 12px 0px 0px !important;
     }
   }
+
+  @media (max-width: 768px) {
+    &__input {
+      width: auto;
+    }
+  }
 }
 
 .btn {
@@ -94,6 +109,10 @@
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 10px;
   }
 }
 

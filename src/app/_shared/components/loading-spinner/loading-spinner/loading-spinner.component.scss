@@ -1,5 +1,9 @@
 .spinner-icon {
   padding-top: 20%;
+
+  @media (max-width: 768px) {
+    padding-top: 0px;
+  }
 }
 
 .spinner-icon  .spinner-border {

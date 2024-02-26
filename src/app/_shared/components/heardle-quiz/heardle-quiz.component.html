@@ -1,7 +1,11 @@
 <div class="play-container__row">
   <div class="play-container__row__left-section">
     <span>#</span>
-    <span class="quiz__index">{{ heardleQuiz.quizIndex + 1 }}/5</span>
+    @if (heardleQuiz.quizSettings.isDailyHeardle) {
+      <span class="quiz__index">{{heardleQuiz.dailyHeardleDayCount}}</span>
+    } @else {
+      <span class="quiz__index">{{ heardleQuiz.quizIndex + 1 }}/5</span>
+    }
   </div>
   <div class="play-container__row__right-section">
     <span class="quiz__timer">{{timeLeft}}</span>

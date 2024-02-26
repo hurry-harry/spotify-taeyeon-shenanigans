@@ -8,7 +8,7 @@ import { DailyHeardleState } from '../../_shared/models/daily-heardle.model';
 import { TracksService } from '../../_shared/services/tracks.service';
 import { HeardleQuizComponent } from '../../_shared/components/heardle-quiz/heardle-quiz.component';
 import { HeardleQuiz } from '../../_shared/models/heardle-quiz.model';
-import { NORMAL_DURATION, NORMAL_TIMER } from '../../_shared/constants/settings.constants';
+import { DATE_STARTED, NORMAL_DURATION, NORMAL_TIMER } from '../../_shared/constants/settings.constants';
 import { formatDate } from '@angular/common';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
@@ -132,7 +132,8 @@ export class DailyHeardleComponent implements OnInit {
       quizTracks: [this.quizTrack],
       quizSettings: { isDailyHeardle: true, timer: NORMAL_TIMER, trackDuration: NORMAL_DURATION },
       utcDate: this.utcDate,
-      dailyHeardleState: this.state
+      dailyHeardleState: this.state,
+      dailyHeardleDayCount: this.getDailyHeardleIndex() + 1
     };
   }
 
@@ -160,5 +161,14 @@ export class DailyHeardleComponent implements OnInit {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: true,
         score: this.state.score, track: this.quizTrack};
     }
+  }
+
+  getDailyHeardleIndex(): number {
+    const parsedStartDate: Date = new Date(DATE_STARTED);
+    const millisecPerDay: number = 1000 * 60 * 60 * 24;
+    const currDate: number = Date.UTC(this.utcDate.getFullYear(), this.utcDate.getMonth(), this.utcDate.getDate());
+    const startDate: number = Date.UTC(parsedStartDate.getFullYear(), parsedStartDate.getMonth(), parsedStartDate.getDate());
+    
+    return Math.floor((startDate - currDate) / millisecPerDay);
   }
 }

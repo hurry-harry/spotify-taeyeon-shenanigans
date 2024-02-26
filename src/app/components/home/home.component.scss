@@ -1,7 +1,11 @@
 .card-container {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-content: center;
   justify-content: center;
   padding-top: 3rem;
+  margin: auto;
+  width: 100%;
+  max-width: 930px;
 }

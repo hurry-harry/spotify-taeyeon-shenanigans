@@ -6,7 +6,7 @@
   height: 200px;
   border-radius: 25px;
   padding: 0.5rem;
-  margin: 1rem;
+  margin: 0.5rem;
   display: flex;
   flex-wrap: wrap;
   color: $taeyeon-white;
@@ -19,5 +19,11 @@
   &__icon {
     width: 64px;
     height: 64px;
+  }
+
+  @media (max-width: 768px) {
+    width: calc(100% - 20px);
+    min-height: auto !important;
+    height: auto;
   }
 }

@@ -7,7 +7,7 @@
   </div>
   <div class="container__mode-tabs">
     @for (mode of topItemModeSelection; track mode) {
-      <button class="btn" [ngClass]="{ 'btn--selected': topItemMode === mode }" (click)="changeItemMode(mode)">{{mode}}</button>
+      <button class="btn container__mode-tabs--mobile" [ngClass]="{ 'btn--selected': topItemMode === mode }" (click)="changeItemMode(mode)">{{mode}}</button>
     } @empty {
       empty mode
     }

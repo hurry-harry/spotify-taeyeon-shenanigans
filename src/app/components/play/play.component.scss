@@ -37,6 +37,28 @@
       margin: 20px 0px 40px;
     }
   }
+
+  @media (max-width: 768px) {
+    height: auto;
+    margin: 40px 10px;
+    padding: 50px 20px;
+
+    &__row {
+      &__left-section {
+        &__header-text {
+          font-size: 20px;
+        }
+
+        &__sub-text {
+          font-size: 12px;
+        }
+      }
+
+      &__right-section {
+        padding: 0px;
+      }
+    }
+  }
 }
 
 .audio {
@@ -131,4 +153,10 @@
 
 .music-player {
   display: none;
+}
+
+@media (max-width: 768px) {
+  .h2 {
+    font-size: 20px;
+  }
 }

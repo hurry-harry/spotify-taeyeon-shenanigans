@@ -54,6 +54,9 @@ export class StatsComponent implements OnInit {
 
   appendTopItems(response: SpotifyBaseResponse, isRemoveDuplicateFirstIndex: boolean = false): void {
     if (this.topItemMode == this.topItemModeSelection[0]) {
+      if (isRemoveDuplicateFirstIndex)
+        (response as ArtistsResponse).items.shift();
+
       this.topArtists.push(...(response as ArtistsResponse).items);
     } else {
       if (isRemoveDuplicateFirstIndex)

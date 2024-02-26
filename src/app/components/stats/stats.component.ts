@@ -52,10 +52,13 @@ export class StatsComponent implements OnInit {
     this.updateTopItems();
   }
 
-  appendTopItems(response: SpotifyBaseResponse): void {
+  appendTopItems(response: SpotifyBaseResponse, isRemoveDuplicateFirstIndex: boolean = false): void {
     if (this.topItemMode == this.topItemModeSelection[0]) {
       this.topArtists.push(...(response as ArtistsResponse).items);
     } else {
+      if (isRemoveDuplicateFirstIndex)
+        (response as TracksResponse).items.shift();
+
       this.topTracks.push(...(response as TracksResponse).items);
     }
   }
@@ -86,7 +89,7 @@ export class StatsComponent implements OnInit {
         this.isLoading = false;
       })
     ).subscribe((response: SpotifyBaseResponse) => {
-      this.appendTopItems(response);
+      this.appendTopItems(response, true);
     });
   }
 

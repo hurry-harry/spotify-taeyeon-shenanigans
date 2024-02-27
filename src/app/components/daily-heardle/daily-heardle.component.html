@@ -1,0 +1,7 @@
+<div class="play-container">
+  @if (isLoading) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else if (!isLoading && !hasPlayedToday) {
+    <app-heardle-quiz [heardleQuiz]="heardleQuiz"></app-heardle-quiz>
+  }
+</div>

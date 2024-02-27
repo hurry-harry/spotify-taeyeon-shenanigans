@@ -1,0 +1,29 @@
+@use "../../../assets/sass/base/variables" as *;
+
+.home-card {
+  background-color: #62587c;
+  width: 275px;
+  height: 200px;
+  border-radius: 25px;
+  padding: 0.5rem;
+  margin: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  color: $taeyeon-white;
+  cursor: pointer;
+
+  &__description {
+    font-weight: 600;
+  }
+
+  &__icon {
+    width: 64px;
+    height: 64px;
+  }
+
+  @media (max-width: 768px) {
+    width: calc(100% - 20px);
+    min-height: auto !important;
+    height: auto;
+  }
+}

@@ -1,0 +1,12 @@
+<div class="nav-bar">
+  <div class="logo" (click)="goToHome()">
+    <h2>TaeyeonShenanigans</h2>
+  </div>
+  <div>
+    @if(user.display_name) {
+      <img alt="spotify profile pic" class="profile-pic" src="{{user.images[0].url}}">
+    } @else {
+      <img alt="default profile pic" class="profile-pic" src="assets/default_profile_pic.png">
+    }
+  </div>
+</div>

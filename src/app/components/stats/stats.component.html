@@ -1,0 +1,80 @@
+<div class="container">
+  <div class="container__header">
+    <h1>Your Music Favorites</h1>
+    <select class="container__header__time-range-select" [ngModel]="timeRange" (change)="changeTimeRange($event)">
+      <option *ngFor="let time of timeRangeSelection" [value]="time">{{time}}</option>
+    </select>
+  </div>
+  <div class="container__mode-tabs">
+    @for (mode of topItemModeSelection; track mode) {
+      <button class="btn container__mode-tabs--mobile" [ngClass]="{ 'btn--selected': topItemMode === mode }" (click)="changeItemMode(mode)">{{mode}}</button>
+    } @empty {
+      empty mode
+    }
+  </div>
+
+  @if (!isLoading) {
+    @if (topItemMode == topItemModeSelection[0]) {
+      <div class="container__artist">
+        <ng-template *ngTemplateOutlet="artists"></ng-template>
+      </div>
+    } @else if (topItemMode == topItemModeSelection[1]) {
+      <ng-template *ngTemplateOutlet="albums"></ng-template>
+    } @else if (topItemMode == topItemModeSelection[2]) {
+      <ng-template *ngTemplateOutlet="tracks"></ng-template>
+    }
+  } @else {
+    <div>
+      <app-loading-spinner></app-loading-spinner>
+    </div>
+  }
+</div>
+
+<ng-template #tracks>
+  @for (track of topTracks; track track.id; let index = $index) {
+    <div class="stats-card stats-card__track" (click)="openItemUrl(track)" tabindex="0" (keypress)="openItemUrl(track)">
+      <h2 class="stats-card__track__index">#{{index + 1}}</h2>
+      <img alt="album cover" class="stats-card__track__album-cover" src="{{track.album.images[0].url}}">
+      <div class="stats-card__track__text-container">
+        <div class="stats-card__track__text-container__text">
+          {{track.name}}
+        </div>
+        <div class="stats-card__track__text-container__text">
+          {{track.artists[0].name}} - {{track.album.name}}
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div>No tracks.</div>
+  }
+</ng-template>
+
+<ng-template #artists>
+  @for (artist of topArtists; track artist.id; let index = $index) {
+    <div class="stats-card stats-card__artist" (click)="openItemUrl(artist)" tabindex="0" (keypress)="openItemUrl(artist)">
+      <img alt="artist picture" class="stats-card__artist__profile-picture" src="{{artist.images[0].url}}">
+      <h3 class="stats-card__artist__name">#{{index + 1}} - {{artist.name}}</h3>
+    </div>
+  } @empty {
+    <div>No artists.</div>
+  }
+</ng-template>
+
+<ng-template #albums>
+  @for (album of topAlbums; track album.album.id; let index = $index) {
+    <div class="stats-card stats-card__track" (click)="openAlbumUrl(album.album)" tabindex="0" (keypress)="openAlbumUrl(album.album)">
+      <h2 class="stats-card__track__index">#{{index + 1}}</h2>
+      <img alt="album cover" class="stats-card__track__album-cover" src="{{album.album.images[0].url}}">
+      <div class="stats-card__track__text-container">
+        <div class="stats-card__track__text-container__text">
+          {{album.album.artists[0].name}} - {{album.album.name}}
+        </div>
+        <div class="stats-card__track__text-container__text">
+          {{album.album.album_type | titlecase | singleEP }}
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div>No albums.</div>
+  }
+</ng-template>

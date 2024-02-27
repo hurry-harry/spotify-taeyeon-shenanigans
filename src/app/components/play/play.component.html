@@ -1,0 +1,53 @@
+<div class="play-container">
+  @if (isLoading) {
+    <app-loading-spinner></app-loading-spinner>
+  } @else {
+    @if (isPlaying) {
+      <app-heardle-quiz [heardleQuiz]="heardleQuiz"></app-heardle-quiz>
+    } @else {
+      <ng-template *ngTemplateOutlet="playSettings"></ng-template>
+    }
+  }
+</div>
+
+<ng-template #playSettings>
+  <div class="play-container__row">
+    <div class="play-container__row__left-section">
+      <h2 class="play-container__row__left-section__header-text">Hard Mode</h2>
+      <p class="play-container__row__left-section__sub-text">
+        - One try per song and clip length is 2s instead of 5s.
+        <br><br>
+        - Time to guess is 10s instead of 20s
+      </p>
+    </div>
+    <div class="play-container__row__right-section">
+      <div class="right-option vert-align-top">
+        <label class="switch">
+          <input type="checkbox" (change)="toggleHardMode($event)"/>
+          <span class="slider round"></span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <div class="play-container__row">
+    <div class="play-container__row__left-section">
+      <h2 class="play-container__row__left-section__header-text">Specific Artist Only</h2>
+      <p class="play-container__row__left-section__sub-text">
+        - Select an artist you'd like to play with just one artist.
+        <br><br>
+        - Only your artists with at least 15 tracks are allowed.
+      </p>
+    </div>
+    <div class="play-container__row__right-section">
+      <ng-select class="dropdown" [(ngModel)]="specificArtist" [items]="specificArtistSelection" placeholder="Search..." [searchable]="true" bindLabel="name"
+        [clearable]="true">
+      </ng-select>
+    </div>
+  </div>
+  <div class="play-container__row">
+    <button class="btn btn-primary btn__play" (click)="play()">
+      Play
+    </button>
+  </div>
+</ng-template>

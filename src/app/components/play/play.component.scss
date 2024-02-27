@@ -1,0 +1,162 @@
+@use '../../../assets/sass/base/variables' as *;
+@use '../../../assets/sass/components/buttons' as *;
+
+.play-container {
+  margin: 40px auto;
+  background-color: #212226;
+  color: #eeeeee;
+  border-radius: 20px;
+  max-width: 800px;
+  padding: 50px 32px;
+  height: 450px;
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+
+    &__left-section {
+      flex-basis: 80%;
+      
+      &__sub-text {
+        font-size: smaller;
+      }
+    }
+
+    &__right-section {
+      text-align: end;
+      flex-basis: 50%;
+      padding: 20px 0px 0px 200px
+    }
+
+    &__submit {
+      align-items: center;
+      justify-content: center;
+    }
+
+    &__audio-row {
+      margin: 20px 0px 40px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    height: auto;
+    margin: 40px 10px;
+    padding: 50px 20px;
+
+    &__row {
+      &__left-section {
+        &__header-text {
+          font-size: 20px;
+        }
+
+        &__sub-text {
+          font-size: 12px;
+        }
+      }
+
+      &__right-section {
+        padding: 0px;
+      }
+    }
+  }
+}
+
+.audio {
+    
+  &__wave {
+    height: 140px;
+  }
+
+  &__controls {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+.quiz {
+
+  &__index {
+    font-size: 50px;
+    font-weight: bolder;
+  }
+
+  &__timer {
+    font-size: 30px;
+    font-weight: bold;
+  }
+
+  &__input {
+    border: 0;
+    border-radius: 12px;
+    width: 400px;
+    padding: 0px 15px;
+    height: 40px;
+    background-color: #eeeeee;
+    color: #212226;
+    font-weight: bold;
+
+    &--focused {
+      border-bottom: 1px solid #d4d4d4 !important;
+      border-radius: 12px 12px 0px 0px !important;
+    }
+  }
+}
+
+.btn {
+  opacity: 1;
+
+  &__play {
+    width: 90px;
+  }
+
+  &__submit {
+    margin-left: 10px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.autocomplete {
+  display: inline-block;
+  position: relative;
+
+  &__container {
+    border-radius: 0px 0px 10px 10px;
+    max-height: 200px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    text-align: left;
+    border-top: none;
+    border-bottom: none;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 10;
+  }
+
+  &__track {
+    padding: 11px 15px;
+    cursor: pointer;
+    background-color: #eeeeee;
+    color: #212226;
+    font-weight: bold;
+
+    &--hover {
+      background-color: #a3a3a3;
+    }
+  }
+}
+
+.music-player {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .h2 {
+    font-size: 20px;
+  }
+}

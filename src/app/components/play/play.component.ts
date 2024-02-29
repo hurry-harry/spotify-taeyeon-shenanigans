@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild, WritableSignal, signal } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Artist, SpotifyBaseResponse, TopArtistsByTrack, Track, TracksResponse } from '../../_shared/models/spotify.model';
 import { SpotifyService } from '../../_shared/services/spotify.service';
 import { UserService } from '../../_shared/services/user.service';
@@ -8,7 +8,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { HARD_MODE_DURATION, HARD_MODE_TIMER, NORMAL_DURATION, NORMAL_TIMER, NUMBER_OF_SONGS } from '../../_shared/constants/settings.constants';
 import { QuizSettings } from '../../_shared/models/quiz.model';
-import { NavigationStart, Router } from '@angular/router';
 import { LoadingSpinnerComponent } from '../../_shared/components/loading-spinner/loading-spinner/loading-spinner.component';
 import { TracksService } from '../../_shared/services/tracks.service';
 import { HeardleQuiz } from '../../_shared/models/heardle-quiz.model';
@@ -22,17 +21,11 @@ import { HeardleQuizComponent } from '../../_shared/components/heardle-quiz/hear
   styleUrl: './play.component.scss'
 })
 export class PlayComponent implements OnInit {
-  @ViewChild("autocompleteContainer", { read: ElementRef }) autocompleteContainer?: ElementRef;
-  @ViewChild("musicPlayer", { read: ElementRef }) musicPlayer!: ElementRef;
-
   timeRanges: string[] = [ "short_term", "medium_term", "long_term" ];
 
   isLoading: boolean = false;
   isPlaying: boolean = false;
-  isFocused: boolean = false;
   isHardMode: boolean = false;
-  isTrackPlaying: boolean = false;
-  isTimerStarted: boolean = false;
 
   topTracksMap: Map<string, Track> = new Map<string, Track>();
   topArtistsByTrackMap: Map<string, TopArtistsByTrack> = new Map<string, TopArtistsByTrack>();
@@ -48,31 +41,10 @@ export class PlayComponent implements OnInit {
 
   heardleQuiz!: HeardleQuiz;
 
-  filteredTracks: Track[] = [];
-  filter: string | null = null;
-  selectedAnswer: Track | null = null;
-  
-  hoverIndex: number = -1;
-
-  timerInterval: any; // for the setInterval
-  timeLeft: number = 0.0;
-  volume: number = 0.3;
-
-  hasFilteredTracksSignal: WritableSignal<boolean> = signal(false);
-  isFocusedSignal: WritableSignal<boolean> = signal(this.isFocused);
-  filteredTracksSignal: WritableSignal<Track[]> = signal([]);
-
   constructor(
-    private router: Router,
     private spotifyService: SpotifyService,
     private tracksService: TracksService,
-    private userService: UserService) {
-      this.router.events.forEach((event): void => {
-        if(event instanceof NavigationStart) {
-          clearInterval(this.timerInterval);
-        }
-      })
-  }
+    private userService: UserService) { }
 
   ngOnInit(): void {
     this.isLoading = true;

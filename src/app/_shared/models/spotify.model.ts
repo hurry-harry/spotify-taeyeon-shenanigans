@@ -5,7 +5,7 @@ export interface SpotifyBaseResponse {
   total: number;
   next: string;
   previous: string;
-};
+}
 
 export interface TracksResponse extends SpotifyBaseResponse {
   items: Track[];

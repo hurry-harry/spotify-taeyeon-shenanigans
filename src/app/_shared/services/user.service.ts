@@ -1,7 +1,6 @@
 import { UserProfileResponse } from "../models/user-profile-response.model";
-import { Injectable, OnInit, WritableSignal, effect, signal } from "@angular/core";
+import { Injectable, WritableSignal, signal } from "@angular/core";
 import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-response.model";
-import { SpotifyService } from "./spotify.service";
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

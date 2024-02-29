@@ -11,7 +11,7 @@ import { HeardleQuiz } from '../../_shared/models/heardle-quiz.model';
 import { DATE_STARTED, NORMAL_DURATION, NORMAL_TIMER } from '../../_shared/constants/settings.constants';
 import { formatDate } from '@angular/common';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
+import { QuizAnswerModalComponent } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal.component';
 import { QuizResult } from '../../_shared/models/result-modal.model';
 
 @Component({
@@ -152,7 +152,7 @@ export class DailyHeardleComponent implements OnInit {
   displayResultModal(): void {
     const isCorrect: boolean = this.state.winStreak > 0;
     
-    const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+    const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModalComponent, { backdrop: 'static', keyboard: false});
 
     if (isCorrect) {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: true,

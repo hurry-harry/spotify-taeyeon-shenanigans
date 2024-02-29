@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Router } from "@angular/router";
@@ -32,11 +34,11 @@ export class SpotifyAuthInterceptor implements HttpInterceptor {
               }); 
             }
             else 
-              this.authService.authError(null);
+              this.authService.authError();
           },
           complete: () => { },
-          error: (error) => {
-            this.authService.authError(error);
+          error: () => {
+            this.authService.authError();
           }
         });
 
@@ -47,7 +49,7 @@ export class SpotifyAuthInterceptor implements HttpInterceptor {
       this.router.navigate(['./login']);
     }
 
-    return throwError(err);
+    return throwError(() => err);
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {

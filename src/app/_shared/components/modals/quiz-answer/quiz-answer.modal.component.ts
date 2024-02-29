@@ -7,11 +7,11 @@ import { Router } from "@angular/router";
 @Component({
   standalone: true,
   selector: 'app-quiz-answer-modal',
-  templateUrl: './quiz-answer.modal.html',
-  styleUrls: ['./quiz-answer.modal.scss'],
+  templateUrl: './quiz-answer.modal.component.html',
+  styleUrls: ['./quiz-answer.modal.component.scss'],
   imports: [CommonModule]
 })
-export class QuizAnswerModal implements OnInit {
+export class QuizAnswerModalComponent implements OnInit {
   @Input() result!: QuizResult;
 
   activeModal: NgbActiveModal = this.activeModalRef;

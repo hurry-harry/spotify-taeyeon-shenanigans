@@ -29,15 +29,15 @@ export class CallbackComponent implements OnInit {
     const urlParams: URLSearchParams = new URLSearchParams(window.location.search);
     const codeVerifier = localStorage.getItem('code_verifier');
 
-    let state: string | null = urlParams.get('state');
-    let code: string | null = urlParams.get('code');
-    let error: string | null = urlParams.get('error');
+    const state: string | null = urlParams.get('state');
+    const code: string | null = urlParams.get('code');
+    const error: string | null = urlParams.get('error');
 
     const isStateValid: boolean = (state === localStorage.getItem('state'));
 
     if (code && codeVerifier && isStateValid) {
       this.authService.getAccessToken(false, code, codeVerifier)
-        .subscribe((response: boolean) => {
+        .subscribe(() => {
           this.router.navigate(['./home']);
         });
     } else if (error || !codeVerifier) {

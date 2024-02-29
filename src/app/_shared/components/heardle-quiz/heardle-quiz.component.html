@@ -15,7 +15,7 @@
   <audio controls #musicPlayer class="music-player">
     <source src="{{heardleQuiz.quizTracks[heardleQuiz.quizIndex].preview_url}}" allow="autoplay" type="audio/mpeg">
   </audio>
-  <div (click)="toggleAudio()" class="audio-wave">
+  <div (click)="toggleAudio()" (keypress)="toggleAudio()" tabindex="0" class="audio-wave">
     <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
     <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>
     <span [ngClass]="(isTrackPlaying ? 'audio-stroke' : 'audio-stroke-paused')"></span>

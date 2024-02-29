@@ -1,11 +1,10 @@
-import { Injectable, WritableSignal, signal } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { SPOTIFY_REDIRECT_URI, SPOTIFY_CLIENT_ID } from "../constants/spotify-auth.constants";
 import { SPOTIFY_AUTHORIZE } from "../constants/spotify-url.constants";
 import { UserService } from "./user.service";
 import { SpotifyService } from "./spotify.service";
 import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-response.model";
-import { Observable, Subject, catchError, concatMap, map, of } from "rxjs";
-import { UserProfileResponse } from "../models/user-profile-response.model";
+import { Observable, Subject, concatMap } from "rxjs";
 import { Router } from "@angular/router";
 
 @Injectable({ providedIn: 'root' })
@@ -46,7 +45,7 @@ export class AuthenticationService {
 
   getAccessToken(isRefreshingToken: boolean, code: string, codeVerifier: string): Observable<boolean> {
     const refreshToken: string = localStorage.getItem('refresh_token')!;
-    let isSuccess: Subject<boolean> = new Subject<boolean>();
+    const isSuccess: Subject<boolean> = new Subject<boolean>();
 
     let params: Record<string, string> = {};
     if (isRefreshingToken) {
@@ -65,25 +64,6 @@ export class AuthenticationService {
       };
     }
 
-    // return this.spotifyService.getAccessToken(params)
-    //   .pipe(
-    //     concatMap((response: SpotifyAccessTokenResponse) => {
-    //       localStorage.setItem('access_token', response.access_token);
-    //       localStorage.setItem('refresh_token', response.refresh_token);
-    //       this.userService.spotifyTokenDetailsSignal.set(response);
-
-    //       return this.spotifyService.getUserProfile(this.userService.spotifyTokenDetailsSignal().access_token);
-    //     })
-    //   ).subscribe((response: UserProfileResponse) => {
-    //     this.userService.userSignal.set(response);
-
-    //     // this.router.navigate(['./home']);
-
-    //     return of(true);
-    //   }, error => {
-    //     return of(false);
-    //   });
-
     this.spotifyService.getAccessToken(params)
       .pipe(
         concatMap((response: SpotifyAccessTokenResponse) => {
@@ -100,7 +80,7 @@ export class AuthenticationService {
         complete: () => {
           isSuccess.next(true);
         },
-        error: (error) => {
+        error: () => {
           isSuccess.next(false);
         }
       });
@@ -129,7 +109,6 @@ export class AuthenticationService {
           }
         },
         error: () => {
-          // TODO: open error Toast saying access refresh failed, pls login again
           return false;
         }
       });
@@ -138,7 +117,7 @@ export class AuthenticationService {
   }
 
   isLoggedIn(): Observable<boolean> {
-    let isSuccess: Subject<boolean> = new Subject<boolean>();
+    const isSuccess: Subject<boolean> = new Subject<boolean>();
 
     if (this.userService.userSignal().id && this.userService.spotifyTokenDetailsSignal().access_token) {
       isSuccess.next(true);
@@ -150,7 +129,7 @@ export class AuthenticationService {
     return isSuccess.asObservable();
   }
 
-  authError(error: Error | null): void {
+  authError(): void {
     this.router.navigate(['']);
   }
 

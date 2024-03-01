@@ -11,6 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { DailyHeardleState } from '../../models/daily-heardle.model';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-heardle-quiz',
@@ -52,7 +53,8 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
   constructor(
     private modalService: NgbModal,
     private router: Router,
-    private tracksService: TracksService
+    private tracksService: TracksService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -89,6 +91,8 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
       modalRef = this.modalService.open(QuizAnswerModalComponent, { backdrop: 'static', keyboard: false});
     else
       modalRef = this.modalService.open(QuizAnswerModalComponent);
+
+    modalRef.componentInstance.heardleQuiz = this.heardleQuiz;
 
     if (isTimeRanOut) {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: this.heardleQuiz.quizIndex === 4 || this.heardleQuiz.quizSettings.isDailyHeardle,
@@ -306,7 +310,7 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
       this.heardleQuiz.dailyHeardleState!.winStreak = 0;
     }
 
-    localStorage.setItem("dailyHeardleState", JSON.stringify(this.heardleQuiz.dailyHeardleState));
+    localStorage.setItem(this.userService.getUserDailyStateId(), JSON.stringify(this.heardleQuiz.dailyHeardleState));
   }
 
   @HostListener('window:popstate', ['$event'])

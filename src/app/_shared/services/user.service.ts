@@ -27,4 +27,8 @@ export class UserService {
   setSpotifyTokenDetails(value: SpotifyAccessTokenResponse): void {
     this.spotifyTokenDetails = value;
   }
+
+  getUserDailyStateId(): string {
+    return `dailyHeardleState:${this.userSignal().id}`;
+  }
 }

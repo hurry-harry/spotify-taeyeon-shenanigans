@@ -100,8 +100,8 @@ export class DailyHeardleComponent implements OnInit {
   }
 
   getDailyHeardleState(): void {
-    if (localStorage.getItem('dailyHeardleState'))
-      this.state = JSON.parse(localStorage.getItem('dailyHeardleState')!);
+    if (localStorage.getItem(this.userService.getUserDailyStateId()))
+      this.state = JSON.parse(localStorage.getItem(this.userService.getUserDailyStateId())!);
     else
       this.buildState();
   }
@@ -153,6 +153,7 @@ export class DailyHeardleComponent implements OnInit {
     const isCorrect: boolean = this.state.winStreak > 0;
     
     const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModalComponent, { backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.heardleQuiz = this.heardleQuiz;
 
     if (isCorrect) {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: true,
@@ -169,6 +170,6 @@ export class DailyHeardleComponent implements OnInit {
     const currDate: number = Date.UTC(this.utcDate.getFullYear(), this.utcDate.getMonth(), this.utcDate.getDate());
     const startDate: number = Date.UTC(parsedStartDate.getFullYear(), parsedStartDate.getMonth(), parsedStartDate.getDate());
     
-    return Math.floor((startDate - currDate) / millisecPerDay);
+    return Math.floor((currDate - startDate) / millisecPerDay);
   }
 }

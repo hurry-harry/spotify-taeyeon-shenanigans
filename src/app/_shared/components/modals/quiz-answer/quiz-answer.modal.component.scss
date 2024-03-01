@@ -21,4 +21,10 @@
   &__score {
     text-decoration: underline;
   }
+
+  &__footer {
+    &--daily {
+      justify-content: space-between;
+    }
+  }
 }

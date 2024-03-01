@@ -25,7 +25,12 @@
       Score: {{result.score}}
     </div>
   </div>
-  <div class="modal-footer" [ngClass]="(result.isCorrect ? 'result-modal--correct' : 'result-modal--incorrect')">
-    <button type="button" class="btn btn-outline-dark" (click)="close()">{{closeButtonText}}</button>
+  <div [ngClass]="(result.isCorrect ? 'result-modal--correct' : 'result-modal--incorrect')">
+    <div class="modal-footer" [ngClass]="(heardleQuiz.dailyHeardleDayCount ? 'result-modal__footer--daily' : '')">
+      @if (heardleQuiz.dailyHeardleDayCount) {
+        <span>Taeyeon Heardle #{{heardleQuiz.dailyHeardleDayCount}}</span>
+      }
+      <button type="button" class="btn btn-outline-dark" (click)="close()">{{closeButtonText}}</button>
+    </div>
   </div>
 </div>

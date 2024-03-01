@@ -6,6 +6,4 @@ export interface QuizResult {
 
   track: Track;
   score: number;
-
-  
 }

@@ -3,14 +3,15 @@ import { HeardleQuiz } from '../../models/heardle-quiz.model';
 import { Track } from '../../models/spotify.model';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
 import { QuizResult } from '../../models/result-modal.model';
-import { QuizAnswerModal } from '../modals/quiz-answer/quiz-answer.modal';
+import { QuizAnswerModalComponent } from '../modals/quiz-answer/quiz-answer.modal.component';
 import { TracksService } from '../../services/tracks.service';
 import { VOLUME_INCREMENTER, VOLUME_DECREMENTER } from '../../constants/settings.constants';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Subscription, filter } from 'rxjs';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { DailyHeardleState } from '../../models/daily-heardle.model';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-heardle-quiz',
@@ -37,7 +38,7 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
   filter: string | null = null;
   selectedAnswer: Track | null = null;
 
-  timerInterval: any; // for the setInterval
+  timerInterval!: NodeJS.Timeout; // for the setInterval
   timeLeft: number = 0.0;
   volume: number = 0.3;
 
@@ -52,7 +53,8 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
   constructor(
     private modalService: NgbModal,
     private router: Router,
-    private tracksService: TracksService
+    private tracksService: TracksService,
+    private userService: UserService
   ) { }
 
   ngOnInit(): void {
@@ -86,9 +88,11 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
     this.musicPlayer.nativeElement.currentTime = 0;
 
     if (this.heardleQuiz.quizIndex === 4 || this.heardleQuiz.quizSettings.isDailyHeardle) 
-      modalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+      modalRef = this.modalService.open(QuizAnswerModalComponent, { backdrop: 'static', keyboard: false});
     else
-      modalRef = this.modalService.open(QuizAnswerModal);
+      modalRef = this.modalService.open(QuizAnswerModalComponent);
+
+    modalRef.componentInstance.heardleQuiz = this.heardleQuiz;
 
     if (isTimeRanOut) {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: false, isLastQuestion: this.heardleQuiz.quizIndex === 4 || this.heardleQuiz.quizSettings.isDailyHeardle,
@@ -205,7 +209,7 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
   }
 
   @HostListener('document:click', ['$event.target'])
-  documentClick(targetElement: any): void {
+  documentClick(targetElement: Node): void {
     const isInside: boolean = this.autocompleteContainer?.nativeElement.contains(targetElement);
 
     if (!isInside) {
@@ -306,7 +310,7 @@ export class HeardleQuizComponent implements OnInit, OnDestroy {
       this.heardleQuiz.dailyHeardleState!.winStreak = 0;
     }
 
-    localStorage.setItem("dailyHeardleState", JSON.stringify(this.heardleQuiz.dailyHeardleState));
+    localStorage.setItem(this.userService.getUserDailyStateId(), JSON.stringify(this.heardleQuiz.dailyHeardleState));
   }
 
   @HostListener('window:popstate', ['$event'])

@@ -11,7 +11,7 @@ import { HeardleQuiz } from '../../_shared/models/heardle-quiz.model';
 import { DATE_STARTED, NORMAL_DURATION, NORMAL_TIMER } from '../../_shared/constants/settings.constants';
 import { formatDate } from '@angular/common';
 import { NgbModal, NgbModalRef } from '@ng-bootstrap/ng-bootstrap';
-import { QuizAnswerModal } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal';
+import { QuizAnswerModalComponent } from '../../_shared/components/modals/quiz-answer/quiz-answer.modal.component';
 import { QuizResult } from '../../_shared/models/result-modal.model';
 
 @Component({
@@ -100,8 +100,8 @@ export class DailyHeardleComponent implements OnInit {
   }
 
   getDailyHeardleState(): void {
-    if (localStorage.getItem('dailyHeardleState'))
-      this.state = JSON.parse(localStorage.getItem('dailyHeardleState')!);
+    if (localStorage.getItem(this.userService.getUserDailyStateId()))
+      this.state = JSON.parse(localStorage.getItem(this.userService.getUserDailyStateId())!);
     else
       this.buildState();
   }
@@ -152,7 +152,8 @@ export class DailyHeardleComponent implements OnInit {
   displayResultModal(): void {
     const isCorrect: boolean = this.state.winStreak > 0;
     
-    const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModal, { backdrop: 'static', keyboard: false});
+    const modalRef: NgbModalRef = this.modalService.open(QuizAnswerModalComponent, { backdrop: 'static', keyboard: false});
+    modalRef.componentInstance.heardleQuiz = this.heardleQuiz;
 
     if (isCorrect) {
       (modalRef.componentInstance.result as QuizResult) = { isCorrect: true, isLastQuestion: true,
@@ -169,6 +170,6 @@ export class DailyHeardleComponent implements OnInit {
     const currDate: number = Date.UTC(this.utcDate.getFullYear(), this.utcDate.getMonth(), this.utcDate.getDate());
     const startDate: number = Date.UTC(parsedStartDate.getFullYear(), parsedStartDate.getMonth(), parsedStartDate.getDate());
     
-    return Math.floor((startDate - currDate) / millisecPerDay);
+    return Math.floor((currDate - startDate) / millisecPerDay);
   }
 }

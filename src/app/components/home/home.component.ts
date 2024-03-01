@@ -43,10 +43,10 @@ export class HomeComponent implements OnInit {
     // const isLoggedIn = this.authService.isLoggedIn();
     this.authService.isLoggedIn()
       .subscribe({
-        next: (response: boolean) => { },
+        next: () => { },
         complete: () => { },
-        error: (error) => {
-          this.authService.authError(error);
+        error: () => {
+          this.authService.authError();
         }
       });
   }

@@ -1,9 +1,9 @@
 import { Injectable } from "@angular/core";
 import { UserProfileResponse } from "../models/user-profile-response.model";
 import { Observable } from "rxjs";
-import { HttpClient, HttpHeaders, HttpParams, HttpParamsOptions } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { SPOTIFY_ACCESS_TOKEN, SPOTIFY_MY_PROFILE, SPOTIFY_MY_TOP_ITEMS, SPOTIFY_SEARCH } from "../constants/spotify-url.constants";
-import { Artist, SpotifyBaseResponse } from "../models/spotify.model";
+import { SpotifyBaseResponse } from "../models/spotify.model";
 import { SpotifyAccessTokenResponse } from "../models/spotify-access-token-response.model";
 import { SearchTrackResponse } from "../models/search-response.model";
 
